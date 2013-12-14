@@ -1,0 +1,2 @@
+#define COLUMN_NAME_SIZE 20
+

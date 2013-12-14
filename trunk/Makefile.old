@@ -1,0 +1,18 @@
+all:
+	make -C lib -f Makefile.old
+	make -C server -f Makefile.old
+	make -C client -f Makefile.old
+
+unit:
+	make -C lib
+	make -C test clean
+	make -C test
+
+clean:
+	make -C lib -f Makefile.old clean
+	make -C server -f Makefile.old clean
+	make -C client -f Makefile.old clean
+	make -C test clean
+
+tag:
+	ctags -R .
