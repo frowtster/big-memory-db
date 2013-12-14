@@ -1,0 +1,72 @@
+------------------------------
+Login
+	-> LSIN [trid] [userid] [password] 0
+	<- LSIN [trid] [error code] 0
+
+Capability
+	-> CAPA [trid] 0
+	<- CAPA [trid] [error code] [capability string] 0
+
+Status
+	-> STAT [trid] 0
+	<- STAT [trid] [error code] [status string] 0
+
+Logout
+	-> LOUT [trid] 0
+	<- LOUT [trid] [error code] 0
+
+------------------------------
+
+List Table
+	-> LTAB [trid] 0
+	<- LTAB [trid] [error code] [body size]
+		table name
+		table name
+		...
+
+Show Table
+	-> STAB [trid] [table name] 0
+	<- STAB [trid] [error code] [body size]
+		[key name] [type] [size]
+		[column name] [type] [size]
+		...
+
+Create Table
+	-> CTAB [trid] [table name] [body size]
+		[column name] [type] [size]
+		[column name] [type] [size]
+		...
+	<- CTAB [trid] [error code] 0
+
+Delete Table
+	-> DTAB [trid] [table name] 0
+	<- DTAB [trid] [error code] 0
+
+Use Table
+	-> UTAB [trid] [table name] 0
+	<- UTAB [trid] [error code] 0
+
+------------------------------
+
+Insert Row
+	-> IROW [trid] [body size]
+		[column name] [key value]
+		[column name] [value]
+		...
+	<- IROW [trid] [error code] 0
+
+Select Row
+	-> SROW [trid] [key] [column name] 0
+	<- SROW [trid] [error code] [body size]
+		value
+
+Update Row
+	-> UROW [trid] [key] [column name] [body size]
+		value
+	<- UROW [trid] [error code] 0
+
+Delete Row
+	-> DROW [trid] [key] 0
+	<- DROW [trid] [error code] 0
+
+------------------------------
