@@ -1,0 +1,32 @@
+# Dispatcher
+
+.SUFFIXES : .cpp .o
+
+INC_DIR = -I /usr/include -I /opt/local/include -I ../lib -I .
+LIB_DIR = -L /usr/lib -L /opt/local/lib -L ../lib
+LIB = -lBmdb -levent
+
+CPP=g++
+CPPFLAGS = -c -g -ggdb $(INC_DIR)
+LDFLAGS = -g -ggdb
+
+OBJS = BmdMain.o UserClient.o Table.o
+SRCS = $(OBJS:.o=.cpp)
+PLAIN_EXEC = bmdb
+
+all: $(PLAIN_EXEC)
+
+$(PLAIN_EXEC): $(OBJS)
+	$(CPP) -o $(PLAIN_EXEC) $(LDFLAGS) $(OBJS) $(LIB_DIR) $(LIB)
+
+clean:
+	rm -f *.o $(PLAIN_EXEC) test/test test/test.o core tags
+
+tag:
+	ctags -R * ..
+
+test: test/test.o $(OBJS)
+	$(CPP) -o test/test.o $(CPPFLAGS) test/test.cpp
+	$(CPP) -o test/test $(LDFLAGS) test/test.o Table.o $(LIB_DIR) $(LIB)
+	./test/test
+
