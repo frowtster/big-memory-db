@@ -18,12 +18,12 @@
 #include "Table.h"
 #include "Version.h"
 #include "Log.h"
-#include "IniFile.h"
+#include "FileIni.h"
 
 using namespace std;
 int gUseSwap;
 Log gLog;
-IniFile inifile;
+FileIni inifile;
 
 int serverport, manageport;
 
@@ -44,11 +44,11 @@ map<string, Table*> Table::mTableMap;
 int main()
 {
 	char value[100];
-	IniFile::GetPrivateProfileStr( "GLOBAL", "SERVER_PORT", "8080", value, 100, "./server.ini" );
+	FileIni::GetPrivateProfileStr( "GLOBAL", "SERVER_PORT", "8080", value, 100, "./server.ini" );
 	serverport = atoi(value);
-	IniFile::GetPrivateProfileStr( "GLOBAL", "MANAGE_PORT", "8081", value, 100, "./server.ini" );
+	FileIni::GetPrivateProfileStr( "GLOBAL", "MANAGE_PORT", "8081", value, 100, "./server.ini" );
 	manageport = atoi(value);
-	IniFile::GetPrivateProfileStr( "GLOBAL", "USE_SWAP", "0", value, 100, "./server.ini" );
+	FileIni::GetPrivateProfileStr( "GLOBAL", "USE_SWAP", "0", value, 100, "./server.ini" );
 	gUseSwap = atoi(value);
 
 	printf("Start Big Memory DB.\n");

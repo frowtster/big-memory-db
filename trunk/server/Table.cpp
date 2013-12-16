@@ -9,20 +9,20 @@
 #include "Table.h"
 #include "Log.h"
 #include "ErrorCode.h"
-#include "IniFile.h"
+#include "FileIni.h"
 
 extern int gUseSwap;
 extern Log gLog;
-extern IniFile inifile;
+extern FileIni inifile;
 
 Table::Table()
 {
 	char value[100];
-	IniFile::GetPrivateProfileStr( "TABLE", "INIT_COUNT", "1000", value, 100, "./server.ini" );
+	FileIni::GetPrivateProfileStr( "TABLE", "INIT_COUNT", "1000", value, 100, "./server.ini" );
 	mInitCount = atoi(value);
-	IniFile::GetPrivateProfileStr( "TABLE", "INCLEMENT_COUNT", "1000", value, 100, "./server.ini" );
+	FileIni::GetPrivateProfileStr( "TABLE", "INCLEMENT_COUNT", "1000", value, 100, "./server.ini" );
 	mIncCount = atoi(value);
-	IniFile::GetPrivateProfileStr( "TABLE", "INCLEMENT_PERCENT", "90", value, 100, "./server.ini" );
+	FileIni::GetPrivateProfileStr( "TABLE", "INCLEMENT_PERCENT", "90", value, 100, "./server.ini" );
 	mIncPercent = atoi(value);
 }
 
@@ -78,6 +78,11 @@ Table *Table::GetTable( string name )
 }
 
 int Table::AddRow( Row *row )
+{
+	return AddRow( row, 0 );
+}
+
+int Table::AddRow( Row *row, unsigned long timeout )
 {
 	char *prow;
 	Node *node;
