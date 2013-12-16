@@ -7,7 +7,7 @@
 
 #define MAX_LINE_LENGTH 512
 
-class IniFile
+class FileIni
 {
 public:
 	static size_t GetPrivateProfileStr(

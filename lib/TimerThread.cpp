@@ -58,7 +58,8 @@ void *TimerThread::TimerLoop( void * )
 
 			pthread_mutex_lock(&mTimerMutex);
 			mList.pop_front();
-			node->mNextTime += node->mInteval;
+			//node->mNextTime += node->mInteval;
+			node->mNextTime = now + node->mInteval;
 			_AddNode( node );
 			pthread_mutex_unlock(&mTimerMutex);
 

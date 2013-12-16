@@ -9,7 +9,7 @@ CPPFLAGS = -c -g -ggdb $(INC_DIR)
 OBJS = EventMain.o EventChannel.o PlainChannel.o HttpChannel.o \
 		Packet.o PlainPacket.o HttpReqPacket.o TimerThread.o \
 		OmniPacket.o OmniClient.o OmniConnect.o \
-		Log.o util.o IniFile.o
+		Log.o util.o FileIni.o
 SRCS = $(OBJS:.o=.cpp)
 
 all: libBmdb.a

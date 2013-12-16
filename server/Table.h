@@ -50,6 +50,7 @@ public:
 	int Refresh();
 
 	int AddRow( Row *row );
+	int AddRow( Row *row, unsigned long timeout );
 	int DelRow( const char * key );
 	int UpdateRow( const char * key, const char *col, const char *value );
 	int UpdateRow( const char * key, const char *col, const char *value, int valsize );

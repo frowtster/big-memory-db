@@ -3,9 +3,9 @@
 #include <ctype.h>
 #include <strings.h>
 
-#include "IniFile.h"
+#include "FileIni.h"
 
-size_t IniFile::GetPrivateProfileStr( const char * lpAppName, const char * lpKeyName, const char * lpDefault, char * lpReturnedString, size_t nSize, const char * lpFileName )
+size_t FileIni::GetPrivateProfileStr( const char * lpAppName, const char * lpKeyName, const char * lpDefault, char * lpReturnedString, size_t nSize, const char * lpFileName )
 {
 	char buff[MAX_LINE_LENGTH];   
 	char *ep;   
