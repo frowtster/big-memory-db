@@ -10,7 +10,7 @@ CPP=g++
 CPPFLAGS = -c -g -ggdb $(INC_DIR)
 LDFLAGS = -g -ggdb
 
-OBJS = BmdMain.o UserClient.o Table.o
+OBJS = BmdbMain.o UserClient.o Table.o
 SRCS = $(OBJS:.o=.cpp)
 PLAIN_EXEC = bmdb
 
