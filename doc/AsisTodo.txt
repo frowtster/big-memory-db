@@ -25,6 +25,9 @@ TODO
 * http protocol
   support http get/post protocol
 
+* JSON protocol
+  support JSON protocol
+
 * thrift protocol
   support thrift protocol
 
