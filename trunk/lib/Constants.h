@@ -1,0 +1,5 @@
+#define TABLE_NAME_SIZE		20
+#define KEY_NAME_SIZE		20
+#define COLUMN_NAME_SIZE	20
+#define TIMEOUT_VALUE_SIZE	8
+

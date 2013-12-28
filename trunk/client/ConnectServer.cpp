@@ -84,11 +84,11 @@ void ConnectServer::TableUse(const char *tname)
 	WritePacket( ret, strlen(ret) );
 }
 
-void ConnectServer::RowInsert(const char *param)
+void ConnectServer::RowInsert(const char *param, time_t timeout)
 {
 	char ret[BUFLEN];
 	bzero( ret, BUFLEN );
-	sprintf( ret, "IROW %lu 0 %ld\r\n%s", 0l, strlen(param), param );
+	sprintf( ret, "IROW %lu %lu %ld\r\n%s", 0l, timeout, strlen(param), param );
 	WritePacket( ret, strlen(ret) );
 }
 

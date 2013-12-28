@@ -1,4 +1,17 @@
 ------------------------------
+MANAGE PORT
+------------------------------
+Backup
+	-> BKUP [trid] [prefix] 0
+	<- BKUP [trid] [error code] [backup name] 0
+
+Restore
+	-> RSTO [trid] [backup name] 0
+	<- RSTO [trid] [error code] 0
+
+------------------------------
+SERVICE PORT
+------------------------------
 Login
 	-> LSIN [trid] [userid] [password] 0
 	<- LSIN [trid] [error code] 0
@@ -49,7 +62,7 @@ Use Table
 ------------------------------
 
 Insert Row
-	-> IROW [trid] [body size]
+	-> IROW [trid] [timeout:sec] [body size]
 		[column name] [key value]
 		[column name] [value]
 		...

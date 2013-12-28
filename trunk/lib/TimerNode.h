@@ -1,7 +1,11 @@
 #pragma once
 
 #include <time.h>
-#include "EventClient.h"
+
+class TimerObject {
+public:
+	virtual void TimerCallback( int mEvent ){};
+};
 
 class event_client;
 
