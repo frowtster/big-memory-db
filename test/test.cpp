@@ -107,6 +107,58 @@ int test_timeout()
 	return 0;
 }
 
+int test_backup()
+{
+	Table *tab1;
+	ColumnInfo colinfo;
+	Row row;
+	char filename[256];
+
+	// create table1
+	colinfo.AddColumn("col1",1,1);
+	colinfo.AddColumn("col2",2,2);
+	colinfo.AddColumn("col3",4,5);
+	tab1 = Table::CreateTable("table1", &colinfo);
+	colinfo.Clear();
+
+	row.AddVal("col1", "1");
+	row.AddVal("col2", "12");
+	row.AddVal("col3", "432");
+	tab1->AddRow( &row );
+	row.Clear();
+	row.AddVal("col1", "2");
+	row.AddVal("col2", "23");
+	row.AddVal("col3", "234");
+	tab1->AddRow( &row, 10 );
+	row.Clear();
+	row.AddVal("col1", "3");
+	row.AddVal("col2", "34");
+	row.AddVal("col3", "456");
+	tab1->AddRow( &row, 20 );
+
+	Table::Backup("table1", filename);
+	gLog.log( "filename %s", filename );
+
+	Table::DeleteTable("table1");
+	tab1 = Table::GetTable("table1");
+	assert( tab1 == NULL );
+
+	sleep(11);
+	Table::Restore( filename );
+
+	tab1 = Table::GetTable("table1");
+	assert( tab1 != NULL );
+	assert( !strcmp(tab1->GetRow( "1", "col2" ), "12" ) );
+	assert( !strcmp(tab1->GetRow( "1", "col3" ), "432" ) );
+	assert( tab1->GetRow( "2", "col2" ) == NULL );
+	assert( tab1->GetRow( "2", "col3" ) == NULL );
+	assert( !strcmp(tab1->GetRow( "3", "col2" ), "34" ) );
+	assert( !strcmp(tab1->GetRow( "3", "col3" ), "456" ) );
+
+	Table::DeleteTable("table1");
+	return 0;
+}
+
 int main() 
 {
 	printf("Version : %s\n", BMDB_VERSION);
@@ -117,5 +169,8 @@ int main()
 
 	test_std();
 //	test_timeout();
+	test_backup();
+
+	return 0;
 }
 

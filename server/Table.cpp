@@ -38,7 +38,7 @@ Table *Table::CreateTable( string name, ColumnInfo *colinfo )
 		gLog.log("new Table error" );
 		return NULL;
 	}
-	table->mTableName = name;
+	strcpy( table->mTableName, name.c_str() );
 	mTableMap[name] = table;
 
 	Column *col;
@@ -120,8 +120,13 @@ int Table::AddRow( Row *row, unsigned long timeout )
 	// set value to buffer
 	Column *col;
 	uint64_t timehost;
-	timehost = htonll( time(0) + timeout );
-	memcpy( prow + pos, &timehost, TIMEOUT_VALUE_SIZE );
+	if( timeout != 0 )
+	{
+		timehost = htonll( time(0) + timeout );
+		memcpy( prow + pos, &timehost, TIMEOUT_VALUE_SIZE );
+		//memcpy( prow + pos, &timehost, 4 );
+		//memset( prow + pos+4, 0x00, 4 );
+	}
 	pos += TIMEOUT_VALUE_SIZE;
 
 	// set timeout
@@ -263,6 +268,204 @@ void Table::Clear()
 		iter++;
 		mExtraRow.push_back( prow );
 	}
+}
+
+int Table::Backup( string name, char *filename )
+{
+	Table *table = GetTable(name);
+	if( table == NULL )
+		return ERROR_TABLE_NOT_FOUND;
+	char value[100];
+	FileIni::GetPrivateProfileStr( "BACKUP", "BACKUP_DIR", "backup", value, 100, "./server.ini" );
+
+	FILE *fp;
+	time_t now = time(0);
+	char fname[256];
+	struct tm *ptm;
+	ptm = localtime(&now);
+
+	sprintf( fname, "%s/%s_%04d%02d%02d_%02d%02d%02d.dmp", value, name.c_str(), 
+			ptm->tm_year+1900, ptm->tm_mon+1, ptm->tm_mday,
+			ptm->tm_hour, ptm->tm_min, ptm->tm_sec );
+	if( (fp = fopen( fname, "a")) == NULL )
+		return ERROR_FILE_NOT_CREATE;
+
+	fprintf( fp, "TABLE %s\r\n", name.c_str() );
+
+	Column *col;
+	list<Column*>::iterator iter2;
+	iter2 = table->mColInfo.mColList.begin();
+	while( iter2 != table->mColInfo.mColList.end() )
+	{
+		col = *iter2;
+		fprintf( fp, "COLUMN %s %d %d\r\n", col->mColName, col->mType, col->mSize );
+		iter2++;
+	}
+
+	fprintf( fp, "DATA %d %d\r\n", table->RowCount(), table->RowSize() );
+
+	char *prow;
+	int i;
+	map<const char *, char*, cmp_str>::iterator iter3;
+	iter3 = table->mRowMap.begin();
+	while( iter3 != table->mRowMap.end() )
+	{
+		prow = iter3->second;
+		for( i=0; i< table->RowSize(); i++ )
+			fprintf( fp, "%.02X ", (unsigned char)prow[i] );
+		fprintf( fp, "\r\n");
+		iter3 ++;
+	}
+
+	fprintf( fp, "END\r\n" );
+
+	fclose( fp );
+
+	strcpy( filename, fname );
+	return ERROR_OK;
+}
+
+int Table::Restore( string name )
+{
+	FILE *fp;
+	char buff[MAX_LINE_LENGTH];
+	char table_name[COLUMN_NAME_SIZE+1];
+	unsigned long count, size;
+	unsigned long i, j;
+	int pos;
+	time_t now;
+	uint64_t timehost;
+	unsigned long timeval;
+
+	char param1[COLUMN_NAME_SIZE+1];
+	char param2[COLUMN_NAME_SIZE+1];
+	char param3[COLUMN_NAME_SIZE+1];
+	char param4[COLUMN_NAME_SIZE+1];
+
+	list<Column*>::iterator iter2;
+	now = time(0);
+
+	if( (fp = fopen( name.c_str(), "r")) == NULL )
+		return ERROR_FILE_NOT_OPEN;
+
+	// TABLE name
+	if( fgets( buff, MAX_LINE_LENGTH-1, fp ) == NULL )
+		return ERROR_FILE_NOT_READ;
+	
+	if( sscanf( buff, "%s %s", param1, param2 ) != 2 )
+		return ERROR_FILE_NOT_READ;
+
+	gLog.log( "table : %s", param2 );
+	strcpy( table_name, param2 );
+
+	Table *table;
+	ColumnInfo colinfo;
+	Column *col;
+	Row row;
+	char *prow;
+
+	table = Table::GetTable( param2 );
+	if( table != NULL )
+	{
+		gLog.log("Restore Table Exist");
+		return ERROR_TABLE_EXIST;
+	}
+
+	colinfo.Clear();
+	// column info
+	while( true )
+	{
+		if( fgets( buff, MAX_LINE_LENGTH-1, fp ) == NULL )
+			return ERROR_FILE_NOT_READ;
+
+		if( sscanf( buff, "%s %s %s %s", param1, param2, param3, param4 ) == 0 )
+			return ERROR_FILE_NOT_READ;
+
+		if( !strcmp( param1, "COLUMN") )
+		{
+			gLog.log( "column : %s %s %s", param2, param3, param4 );
+			colinfo.AddColumn( param2, atoi(param3), atoi(param4) );
+		}
+		else if( !strcmp( param1, "DATA") )
+		{
+			gLog.log( "data : %s %s", param2, param3 );
+			count = atol(param2);
+			size = atol(param3);
+			break;
+		}
+		else
+		{
+			fclose( fp );
+			return ERROR_FILE_FORMAT;
+		}
+	}
+	table = Table::CreateTable( table_name, &colinfo );
+	prow = (char*)malloc(size+1);
+
+	// data
+	for( i=0; i< count; i++ )
+	{
+		row.Clear();
+		pos = 0;
+
+		bzero( prow, size+1 );
+		for( j=0; j< size; j++ )
+		{
+			bzero( buff, 10 );
+			fread( buff, 3, 1, fp );
+			sscanf( buff, "%X", (unsigned int*)&prow[j] );
+		}
+		fread( buff, 2, 1, fp );
+
+		iter2 = table->mColInfo.mColList.begin();
+		col = *iter2;
+		row.AddVal(col->mColName, prow );
+		pos += KEY_NAME_SIZE;
+		
+		// timer
+		char *tmp1 = prow+pos;
+		time_t *tmp2 = (time_t*)tmp1;
+		//timehost = ntohll( *tmp2 );
+		timehost = ntohll( *(time_t*)tmp1 );
+		timeval = 0;
+		if( timehost != 0l )
+		{
+			if( timehost < now )
+			{
+				gLog.log("Data timeout : key:%s", prow );
+				continue;
+			}
+			timeval = timehost - now;
+		}
+
+		pos += TIMEOUT_VALUE_SIZE;
+		iter2 ++;
+		while( iter2 != table->mColInfo.mColList.end() )
+		{
+			col = *iter2;
+			row.AddVal( col->mColName, prow+pos );
+			pos += col->mSize;
+			pos ++;
+			iter2 ++;
+		}
+
+		table->AddRow( &row, timeval );
+	}
+	
+	// END
+	if( fgets( buff, MAX_LINE_LENGTH-1, fp ) == NULL )
+		return ERROR_FILE_NOT_READ;
+	
+	if( sscanf( buff, "%s", param1 ) != 1 )
+		return ERROR_FILE_NOT_READ;
+
+	if( strcmp( param1, "END" ) )
+		gLog.log("Restore FAIL");
+	else
+		gLog.log("Restore SUCCESS");
+
+	fclose( fp );
+	return ERROR_OK;
 }
 
 void Table::Dump()
