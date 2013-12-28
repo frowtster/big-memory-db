@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/mman.h>
+#include <stdint.h>
 
 #include <map>
 #include <list>
