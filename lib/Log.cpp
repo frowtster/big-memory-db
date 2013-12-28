@@ -96,7 +96,7 @@ void Log::log( const char * format, ...)
 	
 	va_start(args, format);
 
-	fprintf(m_fp, "%02d%02d%02d%02d%02d%02d %8s ", 
+	fprintf(m_fp, "%02d%02d%02d:%02d%02d%02d %8s ", 
 			ptm->tm_year - 100, ptm->tm_mon + 1, ptm->tm_mday,
 			ptm->tm_hour, ptm->tm_min, ptm->tm_sec, LEVEL );
 
@@ -136,7 +136,7 @@ void Log::log( loglevel_t level, const char * format, ...)
 	
 	va_start(args, format);
 
-	fprintf(m_fp, "%02d%02d%02d%02d%02d%02d %8s ", 
+	fprintf(m_fp, "%02d%02d%02d:%02d%02d%02d %8s ", 
 			ptm->tm_year - 100, ptm->tm_mon + 1, ptm->tm_mday,
 			ptm->tm_hour, ptm->tm_min, ptm->tm_sec, LEVEL );
 

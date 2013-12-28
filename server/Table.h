@@ -5,12 +5,13 @@
 
 #include "Row.h"
 #include "Column.h"
+#include "TableContainer.h"
 
 #pragma once
 
 using namespace std;
 
-class Table {
+class Table : public TableContainer {
 	struct cmp_str
 	{
 		bool operator()(const char *a, const char *b) const

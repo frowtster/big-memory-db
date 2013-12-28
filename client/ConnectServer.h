@@ -1,3 +1,5 @@
+#include <time.h>
+
 #include "Defines.h"
 #include "TimerThread.h"
 #include "OmniConnect.h"
@@ -20,7 +22,7 @@ public:
 	virtual void TableCreate(const char *tname, const char *param);
 	virtual void TableDelete(const char *tname);
 	virtual void TableUse(const char *tname);
-	virtual void RowInsert(const char *param);
+	virtual void RowInsert(const char *param, time_t timeout);
 	virtual void RowSelect(const char *key, const char *col);
 	virtual void RowUpdate(const char *key, const char *col, const char *val);
 	virtual void RowDelete(const char *key);

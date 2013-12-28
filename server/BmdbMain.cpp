@@ -19,6 +19,7 @@
 #include "Version.h"
 #include "Log.h"
 #include "FileIni.h"
+#include "TimeoutThread.h"
 
 using namespace std;
 int gUseSwap;
@@ -54,6 +55,9 @@ int main()
 	printf("Start Big Memory DB.\n");
 	printf("Version : %s\n", BMDB_VERSION);
 	gLog.init( "log", "BMDB", Log::REOPEN_DD, Log::LEVEL_TRACE );
+
+	// create timeout thread
+	TimeoutThread::CreateInstance();
 
 	// init server
 	srandom( time(NULL) );

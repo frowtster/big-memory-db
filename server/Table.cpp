@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <sys/mman.h>
 
 #include <map>
@@ -10,6 +11,8 @@
 #include "Log.h"
 #include "ErrorCode.h"
 #include "FileIni.h"
+#include "util.h"
+#include "TimeoutThread.h"
 
 extern int gUseSwap;
 extern Log gLog;
@@ -65,8 +68,10 @@ int Table::DeleteTable( string name )
 	{
 		table = iter->second;
 		Table::mTableMap.erase( iter );
+		TimeoutThread::DelNode( table );
 		delete table;
 	}
+
 	return 0;
 }
 
@@ -105,9 +110,25 @@ int Table::AddRow( Row *row, unsigned long timeout )
 	mExtraRow.pop_front();
 	int pos = 0;
 
+	// set key to buffer
+	iter = row->mNodeList.begin();
+	node = *iter;
+	strcpy( prow, node->mValue );
+	pos += KEY_NAME_SIZE;
+	
 	// set value to buffer
 	Column *col;
+	uint64_t timehost;
+	timehost = htonll( time(0) + timeout );
+	memcpy( prow + pos, &timehost, TIMEOUT_VALUE_SIZE );
+	pos += TIMEOUT_VALUE_SIZE;
+
+	// set timeout
+	if( timeout > 0 )
+		TimeoutThread::AddNode( this, key, timeout );
+
 	list<Column*>::iterator iter2 = mColInfo.mColList.begin();
+	iter2++;
 	while( iter2 != mColInfo.mColList.end() )
 	{
 		col = *iter2;
@@ -298,8 +319,15 @@ void Table::Dump()
 int Table::_getColPos(const char *name)
 {
 	int pos = 0;
+	
 	Column *col;
 	list<Column*>::iterator iter = mColInfo.mColList.begin();
+	col = *iter;
+	if( !strcmp( col->mColName, name ) )
+		return pos;
+
+	iter ++;
+	pos += KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
 	while( iter != mColInfo.mColList.end() )
 	{
 		col = *iter;
@@ -314,9 +342,10 @@ int Table::_getColPos(const char *name)
 
 int Table::_getRowLen()
 {
-	int pos = 0;
+	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
 	Column *col;
 	list<Column*>::iterator iter = mColInfo.mColList.begin();
+	iter ++;
 	while( iter != mColInfo.mColList.end() )
 	{
 		col = *iter;
@@ -332,8 +361,9 @@ int Table::_incleaseExtraRow( int rowcount)
 	// make extra rows
 	// get row size
 	Column *col;
-	int rowlen = 0;
+	int rowlen = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
 	list<Column*>::iterator iter = mColInfo.mColList.begin();
+	iter ++;
 	while( iter != mColInfo.mColList.end() )
 	{
 		col = *iter;

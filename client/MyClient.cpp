@@ -30,7 +30,7 @@ class MyServer : public ConnectServer
 		}
 		else if( !strncmp( packet->mCmd, "UTAB", 4 ) )
 		{
-			RowInsert("col1 1\r\ncol2 234\r\n");
+			RowInsert("col1 1\r\ncol2 234\r\n", 0);
 		}
 		else if( !strncmp( packet->mCmd, "IROW", 4 ) )
 		{

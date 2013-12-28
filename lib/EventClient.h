@@ -1,5 +1,6 @@
 #pragma once
 #include "Defines.h"
+#include "TimerNode.h"
 
 enum OBJECT_TYPE {
 	OBJECT_TYPE_ACCEPT = 0,
@@ -10,11 +11,6 @@ struct client {
 	int fd;
 	OBJECT_TYPE type;
 	void *buffer_event;
-};
-
-class TimerObject {
-public:
-	virtual void TimerCallback( int mEvent ){};
 };
 
 class event_client : public client, public TimerObject

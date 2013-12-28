@@ -287,9 +287,11 @@ void UserClient::ReadPacket( OmniPacket *packet, char *buf, size_t len )
 	else if( !strncmp(packet->mCmd, "IROW", 4 ) )
 	{
 		char ret[BUFLEN];
+		char param[NODELEN];
 
 		PARSE_TAG_INIT( packet->mHeader );
-		gLog.log("Insert Row" );
+		PARSE_TAG_NEXT( packet->mHeader, param );
+		gLog.log("Insert Row timeout %s", param );
 
 		Row row;
 		char *buf = packet->mBody;
@@ -321,7 +323,8 @@ void UserClient::ReadPacket( OmniPacket *packet, char *buf, size_t len )
 			row.AddVal( colname, colvalue );
 			buf = next+2;
 		}
-		mTable->AddRow( &row );
+		mTable->AddRow( &row, atoi(param) );
+		Table::Dump();
 
 		sprintf( ret, "IROW %lu %d 0\r\n", packet->mTrid, errCode );
 		WritePacket( ret, strlen(ret) );

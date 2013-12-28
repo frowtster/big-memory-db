@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
+#include <time.h>
+#include <unistd.h>
 #include <string>
 
 #include "Table.h"
@@ -7,6 +9,7 @@
 #include "Row.h"
 #include "Version.h"
 #include "Log.h"
+#include "TimeoutThread.h"
 
 using namespace std;
 
@@ -14,11 +17,8 @@ int gUseSwap;
 Log gLog;
 map<string, Table*> Table::mTableMap;
 
-int main() 
+int test_std()
 {
-	printf("Version : %s\n", BMDB_VERSION);
-
-	gLog.init( "log", "test", Log::REOPEN_DD, Log::LEVEL_TRACE );
 	Table *tab1, *tab2;
 	ColumnInfo colinfo;
 	Row row;
@@ -75,6 +75,46 @@ int main()
 
 	Table::Dump();
 
+	Table::DeleteTable("table1");
+	Table::DeleteTable("table2");
 	return 0;
+}
+
+int test_timeout()
+{
+	Table *tab1;
+	ColumnInfo colinfo;
+	Row row;
+
+	// create table1
+	colinfo.AddColumn("col1",1,1);
+	colinfo.AddColumn("col2",2,2);
+	colinfo.AddColumn("col3",4,5);
+	tab1 = Table::CreateTable("table1", &colinfo);
+	colinfo.Clear();
+
+	row.AddVal("col1", "1");
+	row.AddVal("col2", "12");
+	row.AddVal("col3", "432");
+	tab1->AddRow( &row, 10 );
+	row.Clear();
+	Table::Dump();
+	assert( !strcmp(tab1->GetRow( "1", "col2" ), "12" ) );
+	sleep(11);
+	assert( tab1->GetRow( "1", "col2" ) == NULL );
+	Table::DeleteTable("table1");
+	return 0;
+}
+
+int main() 
+{
+	printf("Version : %s\n", BMDB_VERSION);
+
+	gLog.init( "log", "test", Log::REOPEN_DD, Log::LEVEL_TRACE );
+
+	TimeoutThread::CreateInstance();
+
+	test_std();
+	test_timeout();
 }
 
