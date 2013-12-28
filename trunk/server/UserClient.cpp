@@ -404,6 +404,47 @@ void UserClient::ReadPacket( OmniPacket *packet, char *buf, size_t len )
 		sprintf( ret, "DROW %lu %d 0\r\n", packet->mTrid, errCode );
 		WritePacket( ret, strlen(ret) );
 	}
+	else if( !strncmp(packet->mCmd, "BKUP", 4 ) )
+	{
+		char ret[BUFLEN];
+		bzero( ret, BUFLEN );
+		char param[NODELEN];
+		string table;
+		Table *tab;
+		char filename[256];
+
+		PARSE_TAG_INIT( packet->mHeader );
+		PARSE_TAG_NEXT( packet->mHeader, param );
+		gLog.log("Backup Table [%s]", param );
+
+		tab = Table::GetTable( param );
+		if( tab == NULL )
+		{
+			errCode = ERROR_TABLE_NOT_FOUND;
+			sprintf( ret, "BKUP %lu %d NULL 0\r\n", packet->mTrid, errCode );
+			WritePacket( ret, strlen(ret) );
+			return;
+		}
+
+		table = param;
+		errCode = Table::Backup( table, filename );
+		sprintf( ret, "BKUP %lu %d %s 0\r\n", packet->mTrid, errCode, filename );
+		WritePacket( ret, strlen(ret) );
+	}
+	else if( !strncmp(packet->mCmd, "RSTO", 4 ) )
+	{
+		char ret[BUFLEN];
+		bzero( ret, BUFLEN );
+		char param[NODELEN];
+
+		PARSE_TAG_INIT( packet->mHeader );
+		PARSE_TAG_NEXT( packet->mHeader, param );
+		gLog.log("Restore Table [%s]", param );
+
+		errCode = Table::Restore( param );
+		sprintf( ret, "RSTO %lu %d 0\r\n", packet->mTrid, errCode );
+		WritePacket( ret, strlen(ret) );
+	}
 	else
 	{
 		gLog.log("error. invalid protocol");

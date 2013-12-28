@@ -31,7 +31,7 @@ public:
 	ColumnInfo mColInfo;
 	static map<string, Table*> mTableMap;
 public:
-	string mTableName;
+	char mTableName[TABLE_NAME_SIZE];
 
 	Table();
 	~Table() {
@@ -42,6 +42,9 @@ public:
 	static int DeleteTable( string name );
 	static Table *GetTable( string name );
 	static void Dump();
+
+	static int Backup( string name, char *filename );
+	static int Restore( string name );
 
 	int RowSize();
 	int RowCount();

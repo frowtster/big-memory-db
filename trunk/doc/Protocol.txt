@@ -2,7 +2,7 @@
 MANAGE PORT
 ------------------------------
 Backup
-	-> BKUP [trid] [prefix] 0
+	-> BKUP [trid] [table name] 0
 	<- BKUP [trid] [error code] [backup name] 0
 
 Restore
