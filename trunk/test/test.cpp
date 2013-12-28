@@ -24,6 +24,7 @@ int test_std()
 	Row row;
 
 	// create table1
+	colinfo.Clear();
 	colinfo.AddColumn("col1",1,1);
 	colinfo.AddColumn("col2",2,2);
 	colinfo.AddColumn("col3",4,5);
@@ -115,6 +116,6 @@ int main()
 	TimeoutThread::CreateInstance();
 
 	test_std();
-	test_timeout();
+//	test_timeout();
 }
 
