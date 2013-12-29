@@ -1,0 +1,41 @@
+# Dispatcher
+
+.SUFFIXES : .cpp .o
+
+INC_DIR = -I /usr/include -I /opt/local/include -I ../lib -I .
+LIB_DIR = -L /usr/lib -L /opt/local/lib -L ../lib -L .
+LIB = -lBmdb -lBmdbClient -levent
+
+CPP=g++
+CPPFLAGS = -c -g -ggdb $(INC_DIR)
+LDFLAGS = -g -ggdb
+
+OBJS = MyClient.o ConnectServer.o ServerManager.o
+LIBOBJS = ConnectServer.o ServerManager.o
+EXEOBJS = MyClient.o
+
+LIBSRCS = $(LIBOBJS:.o=.cpp)
+SRCS = $(OBJS:.o=.cpp)
+PLAIN_EXEC = client
+PLAIN_LIB = libBmdbClient.a
+
+all: $(PLAIN_LIB) $(PLAIN_EXEC)
+
+$(PLAIN_LIB): $(LIBOBJS)
+	$(AR) rcv $@ $(LIBOBJS)
+	ranlib $@
+
+$(PLAIN_EXEC): $(OBJS)
+	$(CPP) -o $(PLAIN_EXEC) $(LDFLAGS) $(EXEOBJS) $(LIB_DIR) $(LIB)
+
+clean:
+	rm -f *.o $(PLAIN_EXEC) $(PLAIN_LIB) test/test test/test.o core tags
+
+tag:
+	ctags -R * ..
+
+test: test/test.o $(OBJS)
+	$(CPP) -o test/test.o $(CPPFLAGS) test/test.cpp
+	$(CPP) -o test/test $(LDFLAGS) test/test.o Table.o $(LIB_DIR) $(LIB)
+	./test/test
+
