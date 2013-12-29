@@ -168,7 +168,7 @@ int main()
 	TimeoutThread::CreateInstance();
 
 	test_std();
-//	test_timeout();
+	test_timeout();
 	test_backup();
 
 	return 0;
