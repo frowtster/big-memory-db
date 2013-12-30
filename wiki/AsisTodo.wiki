@@ -1,11 +1,5 @@
 TODO
 
-* data expire (0.2.0)
-  process timeout to expire data such as memcached
-
-* file snapshot (0.2.0)
-  backup current memory state to file, and restore
-
 * master/slave replication (0.3.0)
   multiple server architect
 
@@ -33,3 +27,9 @@ AS-IS
 
 * plain text protocol (0.1.0)
   apply to simple plain text protocol
+
+* data expire (0.2.0)
+  process timeout to expire data such as memcached
+
+* file snapshot (0.2.0)
+  backup current memory state to file, and restore
