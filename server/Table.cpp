@@ -46,7 +46,6 @@ Table *Table::CreateTable( string name, ColumnInfo *colinfo )
 		int res = mlockall(MCL_CURRENT | MCL_FUTURE);
 		if( res != 0 )
 			gLog.log("mlockall fail!.");
-		return NULL;
 	}
 
 	Column *col;
