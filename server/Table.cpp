@@ -28,6 +28,8 @@ Table::Table()
 	mIncCount = atoi(value);
 	FileIni::GetPrivateProfileStr( "TABLE", "INCLEMENT_PERCENT", "90", value, 100, "./server.ini" );
 	mIncPercent = atoi(value);
+
+	mExtraRow.clear();
 }
 
 Table *Table::CreateTable( string name, ColumnInfo *colinfo )
@@ -40,6 +42,14 @@ Table *Table::CreateTable( string name, ColumnInfo *colinfo )
 	}
 	strcpy( table->mTableName, name.c_str() );
 	mTableMap[name] = table;
+
+	if( gUseSwap == 0 )
+	{
+		int res = mlockall(MCL_CURRENT | MCL_FUTURE);
+		if( res != 0 );
+		gLog.log("mlockall fail!.");
+		return NULL;
+	}
 
 	Column *col;
 	Column *newcol;
@@ -586,14 +596,16 @@ int Table::_incleaseExtraRow( int rowcount)
 			return ERROR_MEMALOCK_FAIL;
 		}
 
+		/*
 		if( gUseSwap == 0 )
 		{
 			if( mlock( buf, rowlen ) )
 			{
 				gLog.log("mlock fail!. no free memory!");
-				return ERROR_MEMALOCK_FAIL;
+				//return ERROR_MEMALOCK_FAIL;
 			}
 		}
+		*/
 		mExtraRow.push_back( buf );
 	}
 
