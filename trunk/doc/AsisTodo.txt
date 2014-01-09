@@ -1,16 +1,14 @@
 
 TODO
 
-* data expire (0.2.0)
-  process timeout to expire data such as memcached
+* customized linked list (0.3.0)
 
-* file snapshot (0.2.0)
-  backup current memory state to file, and restore
+* linux support, sunos support (0.3.0)
 
-* master/slave replication (0.3.0)
+* master/slave replication (0.4.0)
   multiple server architect
 
-* authentication (0.4.0)
+* authentication (0.5.0)
   support AES 128bit authentication
   also, support non-authentication.
 
@@ -39,4 +37,10 @@ AS-IS
 
 * plain text protocol (0.1.0)
   apply to simple plain text protocol
+
+* data expire (0.2.0)
+  process timeout to expire data such as memcached
+
+* file snapshot (0.2.0)
+  backup current memory state to file, and restore
 
