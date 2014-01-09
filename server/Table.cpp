@@ -28,8 +28,6 @@ Table::Table()
 	mIncCount = atoi(value);
 	FileIni::GetPrivateProfileStr( "TABLE", "INCLEMENT_PERCENT", "90", value, 100, "./server.ini" );
 	mIncPercent = atoi(value);
-
-	mExtraRow.clear();
 }
 
 Table *Table::CreateTable( string name, ColumnInfo *colinfo )
@@ -46,8 +44,8 @@ Table *Table::CreateTable( string name, ColumnInfo *colinfo )
 	if( gUseSwap == 0 )
 	{
 		int res = mlockall(MCL_CURRENT | MCL_FUTURE);
-		if( res != 0 );
-		gLog.log("mlockall fail!.");
+		if( res != 0 )
+			gLog.log("mlockall fail!.");
 		return NULL;
 	}
 
@@ -117,6 +115,11 @@ int Table::AddRow( Row *row, unsigned long timeout )
 	key = node->mValue;
 
 	// get extra node
+	if( mExtraRow.size() == 0 )
+	{
+		gLog.log("ExtraRow empty!");
+		return ERROR_ROW_NOT_FOUND;
+	}
 	prow = mExtraRow.front();
 	mExtraRow.pop_front();
 	int pos = 0;
