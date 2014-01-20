@@ -19,6 +19,7 @@ TODO
 
 * customized hash map
   replace current data structure to customized hashmap
+  http://troydhanson.github.io/uthash/index.html
 
 * http protocol
   support http get/post protocol
