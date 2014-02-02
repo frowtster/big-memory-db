@@ -6,5 +6,5 @@ ADD_LIBRARY(Bmdb STATIC EventMain.cpp EventChannel.cpp PlainChannel.cpp HttpChan
 		util.cpp FileIni.cpp )
 
 TARGET_LINK_LIBRARIES(Bmdb event)
-INCLUDE_DIRECTORIES(/usr/include /opt/local/include)
+INCLUDE_DIRECTORIES(/usr/include /usr/local/include /opt/local/include )
 set(CMAKE_CXX_FLAGS "-g -ggdb")
