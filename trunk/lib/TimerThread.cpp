@@ -14,8 +14,7 @@ time_t TimerThread::mLastTime = 0;
 
 int TimerThread::CreateInstance()
 {
-	pthread_mutexattr_t mutexattr;
-	pthread_mutex_init(&mTimerMutex, &mutexattr);
+	pthread_mutex_init(&mTimerMutex, NULL);
 
 	return pthread_create( &mTimerThread, NULL, TimerThread::TimerLoop, NULL );
 }
@@ -35,6 +34,8 @@ void TimerThread::Destroy()
 	}
 	pthread_mutex_unlock(&mTimerMutex);
 	*/
+	pthread_cancel( mTimerThread );
+
 	TimerNode *node;
 	ONode *tnode;
 	tnode = TimerThread::mList.getHead();
