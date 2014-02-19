@@ -1,14 +1,13 @@
 #pragma once
 
 #include <pthread.h>
-#include <list>
+#include "LinkedList.h"
 #include "TimerNode.h"
-
-using namespace std;
 
 class TimerThread
 {
-	static list<TimerNode*> mList;
+	//static list<TimerNode*> mList;
+	static OList mList;
 public:
 	static pthread_t mTimerThread;
 	static pthread_mutex_t mTimerMutex;

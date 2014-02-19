@@ -16,7 +16,7 @@ int HttpReqPacket::AddHeader( char *buf )
 
 int HttpReqPacket::AddHeaderLine( const char *buf )
 {
-	Node *node = new Node( buf );
+	ONode *node = new ONode( buf );
 	mListHeader.insert( node );
 	return 0;
 }
@@ -30,8 +30,8 @@ int HttpReqPacket::AddBody( char *buf )
 int HttpReqPacket::Parse()
 {
 	// method
-	Node *node = mListHeader.getHead();
-	char *data = node->Data();
+	ONode *node = mListHeader.getHead();
+	char *data = node->DataChar();
 	char *pos = strchr( data, ' ' );
 	int len = pos - data;
 	if( len > HEADER_LINE_SIZE )
@@ -49,7 +49,7 @@ int HttpReqPacket::Parse()
 	while( node->Next() != NULL )
 	{
 		node = node->Next();
-		data = node->Data();
+		data = node->DataChar();
 		if( !strncasecmp( data, ContentLength, strlen(ContentLength) ) )
 		{
 			strcpy( mContentLength, data+strlen(ContentLength) );

@@ -10,6 +10,7 @@
 #include "Version.h"
 #include "Log.h"
 #include "TimeoutThread.h"
+#include "TimerThread.h"
 
 using namespace std;
 
@@ -107,6 +108,31 @@ int test_timeout()
 	return 0;
 }
 
+class TestEvent : public TimerObject
+{
+public:
+	int state;
+	TestEvent() {
+		state = 0;
+	};
+	virtual void TimerCallback( int mEvent )
+	{
+		state = 5;
+	};
+};
+
+int test_timer()
+{
+	TestEvent *event = new TestEvent;
+	TimerThread::AddNode( event, 10, 5 );
+	TimerThread::dump();
+	sleep(6);
+	assert( event->state == 5 );
+	TimerThread::DelNode( event );
+	delete event;
+	return 0;
+}
+
 int test_backup()
 {
 	Table *tab1;
@@ -166,9 +192,11 @@ int main()
 	gLog.init( "log", "test", Log::REOPEN_DD, Log::LEVEL_TRACE );
 
 	TimeoutThread::CreateInstance();
+	TimerThread::CreateInstance();
 
 	test_std();
 	test_timeout();
+	test_timer();
 	test_backup();
 
 	return 0;

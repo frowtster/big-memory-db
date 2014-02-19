@@ -2,51 +2,76 @@
 #include <stdlib.h>
 #include <string.h>
 
-class Node{
-	friend class List;
+class ONode{
+	friend class OList;
+private:
+	ONode *next;
+	ONode *prev;
+	void *data;
 public:
-	Node(){
+	ONode() {
 		data=NULL;
 		next=NULL;
+		prev=NULL;
 	};
-	~Node(){
+	~ONode() {
 		if( data != NULL )
 		{
 			free( (void*)data );
 			data = NULL;
 		}
 	}
-	Node(const char *i){
-		int len = strlen(i);
-		data = (char*)malloc(len+1);
-		strcpy( data, i );
-		data[len] = '\0';
+	ONode(const char *param) {
+		int len = strlen(param);
+		char *buf = (char*)data;
+		data = malloc(len+1);
+		strcpy( buf, param );
+		buf[len] = '\0';
 
 		next=NULL;
+		prev=NULL;
 	}
-	char *Data()
+	ONode( const void *param, size_t len )
+	{
+		data = malloc(len+1);
+		memcpy( data, param, len );
+
+		next=NULL;
+		prev=NULL;
+	}
+	char *DataChar()
+	{
+		return (char*)data;
+	}
+	void *DataBuf()
 	{
 		return data;
 	}
-	Node *Next()
+	ONode *Next()
 	{
 		return next;
 	}
-private:
-	Node *next;
-	char *data;
+	ONode *Prev()
+	{
+		return prev;
+	}
 };
 
-class List{
+class OList {
 private:
-	Node *head;	
-	Node *tail;	
+	ONode *head;	
+	ONode *tail;	
+	int mCount;
 public:
-	List(){
+	OList() {
+		mCount = 0;
 		head=NULL;
 		tail=NULL;
 	};
-	void insert(Node *insertNode)
+	~OList() {
+		clear();
+	};
+	void insert(ONode *insertNode)
 	{
 		if(head==NULL){
 			head=insertNode;
@@ -54,8 +79,24 @@ public:
 		else{
 			tail->next = insertNode;
 		}
+		insertNode->prev = tail;
 		insertNode->next = NULL;
 		tail=insertNode;
+		mCount ++;
+	}
+	void insertBefore(ONode *base, ONode *pNode)
+	{
+		if( base == NULL )
+			return insert( pNode );
+		if( pNode == NULL )
+			return;
+		ONode *pPrev = base->prev;
+		if( pPrev != NULL )
+			pPrev->next = pNode;
+		pNode->prev = pPrev;
+		pNode->next = base;
+		base->prev = pNode;
+		mCount ++;
 	}
 	void printList()
 	{
@@ -63,15 +104,16 @@ public:
 			printf("List is Empty\n");
 		}
 		else{
-			for(Node *ptr=head;ptr!=NULL;ptr=ptr->next){
+			for(ONode *ptr=head;ptr!=NULL;ptr=ptr->next){
 				printf("[%s]\n", ptr->data );
 			}
 		}
 	}
 	void clear()
 	{
-		Node *ptr = head;
-		Node *ptr2;
+		mCount = 0;
+		ONode *ptr = head;
+		ONode *ptr2;
 		while( ptr != NULL )
 		{
 			ptr2 = ptr;
@@ -82,15 +124,58 @@ public:
 		tail = NULL;
 	}
 
-	Node *getHead()
+	ONode *getHead()
 	{
 		return head;
 	}
 
+	ONode *getTail()
+	{
+		return tail;
+	}
+
+	ONode *getNext( ONode *node )
+	{
+		return node->next;
+	}
+
+	ONode *getPrev( ONode *node )
+	{
+		return node->prev;
+	}
+
+	int getCount()
+	{
+		return mCount;
+	}
+
 	void remove_head()
 	{
-		Node *ptr = head;
+		ONode *ptr = head;
 		head = head->next;
+		if( head != NULL )
+			head->prev = NULL;
 		delete ptr;
+		mCount --;
+		if( head == NULL )
+		{
+			mCount = 0;
+			tail = NULL;
+		}
+	}
+	ONode *remove_at(ONode *pnode)
+	{
+		ONode *ret = pnode->next;
+		if( pnode->prev != NULL )
+			pnode->prev->next = pnode->next;
+		if( pnode->next != NULL )
+			pnode->next->prev = pnode->prev;
+		if( pnode == head )
+			head = pnode->next;
+		if( pnode == tail )
+			tail = pnode->prev;
+		delete pnode;
+		mCount --;
+		return ret;
 	}
 };

@@ -3,8 +3,8 @@ How to build :
 
 	CentOS Linux :
 
-		* install libevent2 (http://libevent.org/)
 		* yum install expat-devel gcc-c++ cmake
+		* install libevent2 (http://libevent.org/)
 		* cmake ./;make or make -f Makefile.old
 
 	OSX 10.9 :
@@ -12,9 +12,12 @@ How to build :
 		* port install libevent cmake
 		* cmake ./;make or make -f Makefile.old
 
-	SunOS :
+	Solaris 11 :
 
-		* make -f Makefile.old
+		* pkg install pkg:/developer/build/cmake
+		* pkg install pkg:/developer/gcc-45
+		* install libevent2 (http://libevent.org/)
+		* cmake ./;make or make -f Makefile.old
 
 How to Run :
 
