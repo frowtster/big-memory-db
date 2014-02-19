@@ -283,6 +283,20 @@ void Table::Clear()
 	}
 }
 
+void Table::Destroy()
+{
+	char *prow;
+	Clear();
+	list<char*>::iterator iter = mExtraRow.begin();
+	while( iter != mExtraRow.end() )
+	{
+		prow = *iter;
+		delete prow;
+		iter++;
+	}
+
+}
+
 int Table::Backup( string name, char *filename )
 {
 	Table *table = GetTable(name);
@@ -325,7 +339,7 @@ int Table::Backup( string name, char *filename )
 	{
 		prow = iter3->second;
 		for( i=0; i< table->RowSize(); i++ )
-			fprintf( fp, "%.02X ", (unsigned char)prow[i] );
+			fprintf( fp, "%.02X ", (unsigned char)(prow[i]) );
 		fprintf( fp, "\r\n");
 		iter3 ++;
 	}
@@ -426,7 +440,7 @@ int Table::Restore( string name )
 		{
 			bzero( buff, 10 );
 			fread( buff, 3, 1, fp );
-			sscanf( buff, "%X", (unsigned int*)&prow[j] );
+			sscanf( buff, "%X", (unsigned int*)&(prow[j]) );
 		}
 		fread( buff, 2, 1, fp );
 

@@ -38,11 +38,11 @@ public:
 			iter++;
 			delete col;
 		}
-		this->Clear();
+		mColList.clear();
 	}
 
 	void Clear() {
-		mColList.clear();
+		Delete();
 	}
 };
 

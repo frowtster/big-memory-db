@@ -35,6 +35,11 @@ void TimerThread::Destroy()
 	}
 	pthread_mutex_unlock(&mTimerMutex);
 	*/
+	TimerNode *node;
+	ONode *tnode;
+	tnode = TimerThread::mList.getHead();
+	while( tnode != NULL )
+		tnode = TimerThread::mList.remove_at(tnode);
 
 	mList.clear();
 	pthread_mutex_destroy( &mTimerMutex );
