@@ -27,7 +27,7 @@ class HttpReqPacket : public Packet
 	char mDate[HEADER_LINE_SIZE];
 	char mUserAgent[HEADER_LINE_SIZE];
 
-	List mListHeader;
+	OList mListHeader;
 
 protected:
 	char mBody[BODY_MAX_SIZE];
