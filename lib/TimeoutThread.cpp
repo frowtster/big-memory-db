@@ -14,14 +14,18 @@ time_t TimeoutThread::mLastTime = 0;
 
 int TimeoutThread::CreateInstance()
 {
-	pthread_mutexattr_t mutexattr;
-	pthread_mutex_init(&mTimeoutMutex, &mutexattr);
+	pthread_mutex_init(&mTimeoutMutex, NULL);
 
 	return pthread_create( &mTimeoutThread, NULL, TimeoutThread::TimeoutLoop, NULL );
 }
 
 void TimeoutThread::Destroy()
 {
+	int ret;
+	ret = pthread_cancel( mTimeoutThread );
+	if( ret != 0 )
+		gLog.log("pthread_cancel return %d", ret );
+
 	TimeoutNode *node;
  	list<TimeoutNode*>::iterator iList;
 	pthread_mutex_lock(&mTimeoutMutex);
@@ -33,7 +37,9 @@ void TimeoutThread::Destroy()
 		delete node;
 	}
 	pthread_mutex_unlock(&mTimeoutMutex);
-	pthread_mutex_destroy( &mTimeoutMutex );
+	ret = pthread_mutex_destroy( &mTimeoutMutex );
+	if( ret != 0 )
+		gLog.log("pthread_mutex_destroy return %d", ret );
 }
 
 void *TimeoutThread::TimeoutLoop( void * )

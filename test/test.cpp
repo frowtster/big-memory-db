@@ -98,11 +98,11 @@ int test_timeout()
 	row.AddVal("col1", "1");
 	row.AddVal("col2", "12");
 	row.AddVal("col3", "432");
-	tab1->AddRow( &row, 10 );
+	tab1->AddRow( &row, 2 );
 	row.Clear();
 	Table::Dump();
 	assert( !strcmp(tab1->GetRow( "1", "col2" ), "12" ) );
-	sleep(11);
+	sleep(3);
 	assert( tab1->GetRow( "1", "col2" ) == NULL );
 	Table::DeleteTable("table1");
 	return 0;
@@ -124,9 +124,9 @@ public:
 int test_timer()
 {
 	TestEvent *event = new TestEvent;
-	TimerThread::AddNode( event, 10, 5 );
+	TimerThread::AddNode( event, 10, 2 );
 	TimerThread::dump();
-	sleep(6);
+	sleep(3);
 	assert( event->state == 5 );
 	TimerThread::DelNode( event );
 	delete event;
@@ -155,12 +155,12 @@ int test_backup()
 	row.AddVal("col1", "2");
 	row.AddVal("col2", "23");
 	row.AddVal("col3", "234");
-	tab1->AddRow( &row, 10 );
+	tab1->AddRow( &row, 2 );
 	row.Clear();
 	row.AddVal("col1", "3");
 	row.AddVal("col2", "34");
 	row.AddVal("col3", "456");
-	tab1->AddRow( &row, 20 );
+	tab1->AddRow( &row, 4 );
 
 	Table::Backup("table1", filename);
 	gLog.log( "filename %s", filename );
@@ -169,7 +169,7 @@ int test_backup()
 	tab1 = Table::GetTable("table1");
 	assert( tab1 == NULL );
 
-	sleep(11);
+	sleep(3);
 	Table::Restore( filename );
 
 	tab1 = Table::GetTable("table1");
@@ -187,6 +187,7 @@ int test_backup()
 
 int main() 
 {
+	int ret;
 	printf("Version : %s\n", BMDB_VERSION);
 
 	gLog.init( "log", "test", Log::REOPEN_DD, Log::LEVEL_TRACE );
@@ -194,13 +195,18 @@ int main()
 	TimeoutThread::CreateInstance();
 	TimerThread::CreateInstance();
 
-	test_std();
-	test_timeout();
-	test_timer();
-	test_backup();
+	//while( true )
+	{
+		test_std();
+		test_timeout();
+		test_timer();
+		test_backup();
 
-	TimeoutThread::Destroy();
+		usleep(1000);
+	}
+
 	TimerThread::Destroy();
+	TimeoutThread::Destroy();
 
 	return 0;
 }
