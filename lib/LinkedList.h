@@ -105,7 +105,7 @@ public:
 		}
 		else{
 			for(ONode *ptr=head;ptr!=NULL;ptr=ptr->next){
-				printf("[%s]\n", ptr->data );
+				printf("[%s]\n", (char*)ptr->data );
 			}
 		}
 	}

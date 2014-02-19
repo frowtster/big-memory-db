@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
+#include <list>
 
 #include "EventChannel.h"
 #include "ServerManager.h"
 #include "Log.h"
+
+using namespace std;
+
 extern Log gLog;
 
 list<struct ServerInfo*> gServerList;

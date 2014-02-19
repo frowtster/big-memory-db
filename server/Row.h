@@ -45,11 +45,11 @@ public:
 			iter++;
 			delete node;
 		}
-		this->Clear();
+		mNodeList.clear();
 	}
 
 	void Clear() {
-		mNodeList.clear();
+		Delete();
 	}
 };
 

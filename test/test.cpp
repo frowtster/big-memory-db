@@ -199,6 +199,9 @@ int main()
 	test_timer();
 	test_backup();
 
+	TimeoutThread::Destroy();
+	TimerThread::Destroy();
+
 	return 0;
 }
 

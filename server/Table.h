@@ -35,7 +35,7 @@ public:
 
 	Table();
 	~Table() {
-		Clear();
+		Destroy();
 	};
 
 	static Table *CreateTable( string name, ColumnInfo *colinfo );
@@ -51,6 +51,7 @@ public:
 	int ReserveCount();
 
 	void Clear();
+	void Destroy();
 	int Refresh();
 
 	int AddRow( Row *row );
