@@ -17,7 +17,7 @@ int HttpReqPacket::AddHeader( char *buf )
 int HttpReqPacket::AddHeaderLine( const char *buf )
 {
 	ONode *node = new ONode( buf );
-	mListHeader.insert( node );
+	mListHeader.InsertBack( node );
 	return 0;
 }
 
@@ -30,7 +30,7 @@ int HttpReqPacket::AddBody( char *buf )
 int HttpReqPacket::Parse()
 {
 	// method
-	ONode *node = mListHeader.getHead();
+	ONode *node = mListHeader.GetHead();
 	char *data = node->DataChar();
 	char *pos = strchr( data, ' ' );
 	int len = pos - data;
@@ -73,7 +73,7 @@ int HttpReqPacket::Parse()
 
 void HttpReqPacket::Clear()
 {
-	mListHeader.clear();
+	mListHeader.Clear();
 
 }
 
@@ -107,9 +107,9 @@ char *HttpReqPacket::GetUserAgent()
 	return NULL;
 }
 
-void HttpReqPacket::printHeader()
+void HttpReqPacket::PrintHeader()
 {
-	mListHeader.printList();
+	mListHeader.PrintList();
 	gLog.log("Method [%s]", mMethod );
 	gLog.log("RequestURI [%s]", mRequestURI );
 	gLog.log("ContentLength [%s]", mContentLength );

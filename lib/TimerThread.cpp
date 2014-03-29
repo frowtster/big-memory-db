@@ -38,11 +38,11 @@ void TimerThread::Destroy()
 
 	TimerNode *node;
 	ONode *tnode;
-	tnode = TimerThread::mList.getHead();
+	tnode = TimerThread::mList.GetHead();
 	while( tnode != NULL )
-		tnode = TimerThread::mList.remove_at(tnode);
+		tnode = TimerThread::mList.RemoveAt(tnode);
 
-	mList.clear();
+	mList.Clear();
 	pthread_mutex_destroy( &mTimerMutex );
 }
 
@@ -54,7 +54,7 @@ void *TimerThread::TimerLoop( void * )
 
 	while (true )
 	{
-		if( mList.getCount() == 0 )
+		if( mList.GetCount() == 0 )
 		{
 			sleep(1);
 			now = time(0);
@@ -62,7 +62,7 @@ void *TimerThread::TimerLoop( void * )
 		}
 
 		//node = mList.front();
-		node = (TimerNode*)(mList.getHead()->DataBuf());
+		node = (TimerNode*)(mList.GetHead()->DataBuf());
 //		gLog.log("now %d node %d", (int)now, (int)node->mNextTime);
 		if( node->mNextTime <= now )
 		{
@@ -75,7 +75,7 @@ void *TimerThread::TimerLoop( void * )
 			node->mNextTime = now + node->mInteval;
 			_AddNode( node );
 			//mList.pop_front();
-			mList.remove_head();
+			mList.RemoveHead();
 			pthread_mutex_unlock(&mTimerMutex);
 
 			continue;
@@ -97,7 +97,7 @@ int TimerThread::_AddNode( TimerNode *node )
 	if( node->mNextTime >= mLastTime )
 	{
 		//TimerThread::mList.push_back( node );
-		TimerThread::mList.insert( pNode );
+		TimerThread::mList.InsertBack( pNode );
 		mLastTime = node->mNextTime;
 	}
 	else
@@ -127,25 +127,25 @@ int TimerThread::_AddNode( TimerNode *node )
 			mList.push_front( node );
 		}
 		*/
-		tnode = mList.getTail();
+		tnode = mList.GetTail();
 		do {
-			if( tnode == mList.getHead() )
+			if( tnode == mList.GetHead() )
 			{
-				mList.insertBefore( tnode, pNode );
+				mList.InsertBefore( tnode, pNode );
 				break;
 			}
 			tnode = tnode->Prev();
 			if( ((TimerNode*)tnode->DataBuf())->mNextTime <= node->mNextTime )
 			{
 				tnode = tnode->Next();
-				mList.insertBefore( tnode, pNode );
+				mList.InsertBefore( tnode, pNode );
 				break;
 			}
 		} while( tnode != NULL );
 
 		if( tnode == NULL )
 		{
-			mList.insertBefore( mList.getHead(), pNode );
+			mList.InsertBefore( mList.GetHead(), pNode );
 		}
 	}
 	//gLog.log("after _AddNode count %ld", mList.size());
@@ -191,13 +191,13 @@ int TimerThread::DelNode( TimerObject *client, int event )
 			iList ++;
 	}
 	*/
-	tnode = TimerThread::mList.getHead();
+	tnode = TimerThread::mList.GetHead();
 	while( tnode != NULL )
 	{
 		node = (TimerNode*)(tnode->DataBuf());
 		if( node->mClient == client && node->mEvent == event )
 		{
-			tnode = TimerThread::mList.remove_at(tnode);
+			tnode = TimerThread::mList.RemoveAt(tnode);
 		}
 		else
 			tnode = tnode->Next();
@@ -230,13 +230,13 @@ int TimerThread::DelNode( TimerObject *client )
 			iList ++;
 	}
 	*/
-	tnode = TimerThread::mList.getHead();
+	tnode = TimerThread::mList.GetHead();
 	while( tnode != NULL )
 	{
 		node = (TimerNode*)(tnode->DataBuf());
 		if( node->mClient == client )
 		{
-			tnode = TimerThread::mList.remove_at(tnode);
+			tnode = TimerThread::mList.RemoveAt(tnode);
 		}
 		else
 			tnode = tnode->Next();
@@ -249,7 +249,7 @@ int TimerThread::DelNode( TimerObject *client )
 
 size_t TimerThread::Size()
 {
-	return TimerThread::mList.getCount();
+	return TimerThread::mList.GetCount();
 }
 
 void TimerThread::dump()
@@ -265,7 +265,7 @@ void TimerThread::dump()
 		gLog.log("%d %d %d %p", (int)(*iList)->mNextTime, (int)(*iList)->mInteval, (*iList)->mEvent, (*iList)->mClient );
 	}
 	*/
-	for( tnode = TimerThread::mList.getHead(); tnode != NULL; tnode = tnode->Next() )
+	for( tnode = TimerThread::mList.GetHead(); tnode != NULL; tnode = tnode->Next() )
 	{
 		node = (TimerNode*)(tnode->DataBuf());
 		gLog.log("%d %d %d %p", (int)node->mNextTime, (int)node->mInteval, node->mEvent, node->mClient );
