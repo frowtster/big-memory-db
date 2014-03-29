@@ -69,9 +69,9 @@ public:
 		tail=NULL;
 	};
 	~OList() {
-		clear();
+		Clear();
 	};
-	void insert(ONode *insertNode)
+	void InsertBack(ONode *insertNode)
 	{
 		if(head==NULL){
 			head=insertNode;
@@ -84,10 +84,10 @@ public:
 		tail=insertNode;
 		mCount ++;
 	}
-	void insertBefore(ONode *base, ONode *pNode)
+	void InsertBefore(ONode *base, ONode *pNode)
 	{
 		if( base == NULL )
-			return insert( pNode );
+			return InsertBack( pNode );
 		if( pNode == NULL )
 			return;
 		ONode *pPrev = base->prev;
@@ -98,7 +98,7 @@ public:
 		base->prev = pNode;
 		mCount ++;
 	}
-	void printList()
+	void PrintList()
 	{
 		if(head==NULL){
 			printf("List is Empty\n");
@@ -109,7 +109,7 @@ public:
 			}
 		}
 	}
-	void clear()
+	void Clear()
 	{
 		mCount = 0;
 		ONode *ptr = head;
@@ -124,32 +124,32 @@ public:
 		tail = NULL;
 	}
 
-	ONode *getHead()
+	ONode *GetHead()
 	{
 		return head;
 	}
 
-	ONode *getTail()
+	ONode *GetTail()
 	{
 		return tail;
 	}
 
-	ONode *getNext( ONode *node )
+	ONode *GetNext( ONode *node )
 	{
 		return node->next;
 	}
 
-	ONode *getPrev( ONode *node )
+	ONode *GetPrev( ONode *node )
 	{
 		return node->prev;
 	}
 
-	int getCount()
+	int GetCount()
 	{
 		return mCount;
 	}
 
-	void remove_head()
+	void RemoveHead()
 	{
 		ONode *ptr = head;
 		head = head->next;
@@ -163,7 +163,7 @@ public:
 			tail = NULL;
 		}
 	}
-	ONode *remove_at(ONode *pnode)
+	ONode *RemoveAt(ONode *pnode)
 	{
 		ONode *ret = pnode->next;
 		if( pnode->prev != NULL )

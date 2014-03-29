@@ -50,6 +50,6 @@ public:
 	char *GetDate();
 	char *GetUserAgent();
 
-	void printHeader();
+	void PrintHeader();
 };
 
