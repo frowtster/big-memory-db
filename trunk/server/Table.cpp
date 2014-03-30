@@ -70,6 +70,7 @@ Table *Table::CreateTable( string name, ColumnInfo *colinfo )
 
 int Table::DeleteTable( string name )
 {
+	gLog.log("DeleteTable");
 	Table *table;
 	
 	map<string, Table*>::iterator iter = Table::mTableMap.find( name );
