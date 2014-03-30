@@ -85,7 +85,7 @@ void *TimeoutThread::TimeoutLoop( void * )
 //		gLog.log("now %d node %d", (int)now, (int)node->mTime);
 		if( node->mTime <= now )
 		{
-			gLog.log("mTime %d mClient %p", (int)node->mTime, node->mTable );
+			gLog.log("mTime %d mThread %p", (int)node->mTime, node->mTable );
 
 			pthread_mutex_lock(&mTimeoutMutex);
 			node->mTable->DelRow( node->mKey );
