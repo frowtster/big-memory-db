@@ -8,4 +8,4 @@ clean:
 	rm -f *.o test
 
 val:
-	valgrind --tool=memcheck --leak-check=full --show-reachable=yes ./test
+	valgrind -v --track-origins=yes --tool=memcheck --leak-check=full --show-reachable=yes ./test
