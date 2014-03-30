@@ -16,7 +16,19 @@ int TimerThread::CreateInstance()
 {
 	pthread_mutex_init(&mTimerMutex, NULL);
 
-	return pthread_create( &mTimerThread, NULL, TimerThread::TimerLoop, NULL );
+	int status, rc;
+	rc = pthread_create( &mTimerThread, NULL, TimerThread::TimerLoop, NULL );
+	if( rc )
+	{
+		gLog.log("pthread_create return rc %d", rc);
+		return rc;
+	}
+	/*
+	rc = pthread_join( mTimerThread, (void **)&status);
+	if( rc )
+		gLog.log("pthread_join return rc %d", rc);
+	*/
+	return rc;
 }
 
 void TimerThread::Destroy()
@@ -36,6 +48,7 @@ void TimerThread::Destroy()
 	*/
 	pthread_cancel( mTimerThread );
 
+	pthread_mutex_lock(&mTimerMutex);
 	TimerNode *node;
 	ONode *tnode;
 	tnode = TimerThread::mList.GetHead();
@@ -43,6 +56,7 @@ void TimerThread::Destroy()
 		tnode = TimerThread::mList.RemoveAt(tnode);
 
 	mList.Clear();
+	pthread_mutex_unlock(&mTimerMutex);
 	pthread_mutex_destroy( &mTimerMutex );
 }
 
@@ -155,7 +169,6 @@ int TimerThread::_AddNode( TimerNode *node )
 int TimerThread::AddNode( TimerObject *client, int event, int inteval )
 {
 	//gLog.log("AddNode before size %ld", mList.size() );
- 	//list<TimerNode*>::iterator iList;
 	time_t now = time(0);
 	struct TimerNode *node = new TimerNode;
 	node->mNextTime = now+inteval;

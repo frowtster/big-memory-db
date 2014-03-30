@@ -2,15 +2,14 @@
 
 #include <pthread.h>
 #include <time.h>
-#include <list>
 #include "TimeoutNode.h"
 #include "TableContainer.h"
-
-using namespace std;
+#include "LinkedList.h"
 
 class TimeoutThread
 {
-	static list<TimeoutNode*> mList;
+	//static list<TimeoutNode*> mList;
+	static OList mList;
 public:
 	static pthread_t mTimeoutThread;
 	static pthread_mutex_t mTimeoutMutex;
