@@ -103,9 +103,8 @@ int test_timeout()
 	Table::Dump();
 	assert( !strcmp(tab1->GetRow( "1", "col2" ), "12" ) );
 	sleep(3);
-	/*
+
 	assert( tab1->GetRow( "1", "col2" ) == NULL );
-	*/
 	Table::DeleteTable("table1");
 	return 0;
 }
@@ -193,16 +192,17 @@ int main()
 	printf("Version : %s\n", BMDB_VERSION);
 
 	gLog.init( "log", "test", Log::REOPEN_DD, Log::LEVEL_TRACE );
+	gLog.log( "== Start test program! ==" );
 
 	TimeoutThread::CreateInstance();
 	TimerThread::CreateInstance();
 
 	//while( true )
 	{
-//		test_std();
+		test_std();
 		test_timeout();
-//		test_timer();
-//		test_backup();
+		test_timer();
+		test_backup();
 
 		usleep(1000);
 	}
