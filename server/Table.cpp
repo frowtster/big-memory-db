@@ -291,7 +291,7 @@ void Table::Destroy()
 	while( iter != mExtraRow.end() )
 	{
 		prow = *iter;
-		delete prow;
+		free( prow );
 		iter++;
 	}
 

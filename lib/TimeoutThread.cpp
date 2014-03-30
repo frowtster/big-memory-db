@@ -88,9 +88,9 @@ void *TimeoutThread::TimeoutLoop( void * )
 			gLog.log("mTime %d mClient %p", (int)node->mTime, node->mTable );
 
 			pthread_mutex_lock(&mTimeoutMutex);
+			node->mTable->DelRow( node->mKey );
 			//mList.pop_front();
 			mList.RemoveHead();
-			node->mTable->DelRow( node->mKey );
 			pthread_mutex_unlock(&mTimeoutMutex);
 
 			continue;
