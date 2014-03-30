@@ -1,9 +1,5 @@
 TODO
 
-* customized linked list (0.3.0)
-
-* linux support, sunos support (0.3.0)
-
 * master/slave replication (0.4.0)
   multiple server architect
 
@@ -37,3 +33,7 @@ AS-IS
 
 * file snapshot (0.2.0)
   backup current memory state to file, and restore
+
+* customized linked list (0.3.0)
+
+* linux support, sunos support (0.3.0)
