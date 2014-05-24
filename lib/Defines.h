@@ -47,3 +47,10 @@ do													\
 	*(cNode+taglen) = '\0';							\
 	nPos += (taglen+1);								\
 } while(0)
+
+#define DISPATCH_COMMAND_BEGIN( func )				\
+	if( packet->mCmd[0] == '\0' )	errCode = func( packet )
+#define DISPATCH_COMMAND_NEXT( cmd, func )			\
+	else if( !strncmp(packet->mCmd, cmd, 4 ) )	errCode = func( packet )
+#define DISPATCH_COMMAND_END( func )				\
+	else errCode = func( packet )

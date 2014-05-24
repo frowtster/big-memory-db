@@ -26,7 +26,7 @@ int gUseSwap;
 Log gLog;
 FileIni inifile;
 
-int serverport, manageport;
+int serviceport, serverport, manageport;
 
 class UserFactory : public EventFactory
 {
@@ -34,7 +34,7 @@ class UserFactory : public EventFactory
 		static event_client* createInstance( int port )
 		{
 			gLog.log("create instance [%d]", port );
-			if( port == serverport )
+			if( port == serviceport )
 				return new UserClient(false);
 			return NULL;
 		}

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.6)
 
 PROJECT(bmdb)
-ADD_EXECUTABLE(bmdb BmdbMain.cpp UserClient.cpp Table.cpp)
+ADD_EXECUTABLE(bmdb BmdbMain.cpp UserClient.cpp ServerClient.cpp Table.cpp)
 
 FIND_LIBRARY(EVENT_LIB NAMES event PATHS /opt/local/lib)
 FIND_LIBRARY(BMDB_LIB NAMES Bmdb PATHS ../lib)
