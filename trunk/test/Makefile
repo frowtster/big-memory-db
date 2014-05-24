@@ -1,6 +1,6 @@
 all:
-	make -C unit/
+	make -C single-unit/
 
 clean:
-	make -C unit/ clean
+	make -C single-unit/ clean
 
