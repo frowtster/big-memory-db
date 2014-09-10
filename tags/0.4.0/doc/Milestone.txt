@@ -1,8 +1,4 @@
-
 TO-DO
-
-* master/slave replication (0.4.0)
-  multiple server architect
 
 * authentication (0.5.0)
   support AES 128bit authentication
@@ -44,4 +40,7 @@ AS-IS
 * customized linked list (0.3.0)
 
 * linux support, sunos support (0.3.0)
+
+* master/slave replication (0.4.0)
+  multiple server architect
 
