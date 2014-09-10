@@ -1,0 +1,41 @@
+
+How to build :
+
+	CentOS Linux :
+
+		* yum install expat-devel gcc-c++ cmake
+		* install libevent2 (http://libevent.org/)
+		* cmake ./;make or make -f Makefile.old
+
+	OSX 10.9 :
+
+		* port install libevent cmake
+		* cmake ./;make or make -f Makefile.old
+
+	Solaris 11 :
+
+		* pkg install pkg:/developer/build/cmake
+		* pkg install pkg:/developer/gcc-45
+		* install libevent2 (http://libevent.org/)
+		* cmake ./;make or make -f Makefile.old
+
+How to Run :
+
+	Server :
+
+		* goto server/
+		* modify server.ini file
+			* SERVER_PORT : listen port
+			* USE_SWAP : allow page in/out
+			* INIT_COUNT : when table is created, reserved memory row count
+			* INCLEMENT_COUNT : when reserved memory shotage, next inclement count
+			* INCLEMENT_PERCENT : maximum reserved memory usage.
+								when approached to that percent, reserved memory incleased.
+		* run ./bmdb
+
+	Client :
+		
+		* goto client/
+		* subcless Servermanager, ConnectServer to your program.
+		* example is MyClient.cpp
+		* embedding to your program.

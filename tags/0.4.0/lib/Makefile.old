@@ -1,0 +1,29 @@
+.SUFFIXES : .cpp .o
+
+INC_DIR = -I /usr/include -I /opt/local/include 
+LIB_DIR = -L /usr/lib -L /opt/local/lib
+
+CPP=g++
+CPPFLAGS = -c -g -ggdb $(INC_DIR)
+
+OBJS = EventMain.o EventChannel.o PlainChannel.o HttpChannel.o \
+		Packet.o PlainPacket.o HttpReqPacket.o TimerThread.o \
+		OmniPacket.o OmniClient.o OmniConnect.o \
+		Log.o util.o FileIni.o
+SRCS = $(OBJS:.o=.cpp)
+
+all: libBmdb.a
+
+libBmdb.a: $(OBJS)
+	$(AR) rcv $@ $(OBJS)
+	ranlib $@
+
+clean:
+	rm -f *.o libBmdb.a
+
+tag:
+	ctags *
+
+gtest:
+	make clean -C test
+	make -C test
