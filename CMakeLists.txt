@@ -4,6 +4,6 @@ PROJECT(bmdb)
 
 ADD_SUBDIRECTORY(lib)
 ADD_SUBDIRECTORY(server_db)
-ADD_SUBDIRECTORY(server_relay)
+#ADD_SUBDIRECTORY(server_relay)
 ADD_SUBDIRECTORY(client)
 
