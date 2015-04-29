@@ -1,11 +1,17 @@
 TODO
 
-* authentication (0.5.0)
+* refactoring (0.5.0)
+    refactoring main singleton instance
+
+* list store (0.5.0)
+    support list type store, list return, node return
+
+* authentication
   support AES 128bit authentication
   also, support non-authentication.
 
-* distribute server
-  multiple server architect
+* distribute server 2
+  multiple server architect 2
 
 * customized hash map
   replace current data structure to customized hashmap
