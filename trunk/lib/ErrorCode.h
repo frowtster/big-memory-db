@@ -17,10 +17,14 @@
 #define ERROR_TABLE_NOT_FOUND	202		// table not found
 #define ERROR_TABLE_DUP			203		// table duplicate
 #define ERROR_TABLE_EXIST		204		// table exist
+#define ERROR_TABLE_TYPE		205		// table type error. multi/single column
 
 // row error
 #define ERROR_ROW_NOT_FOUND		301		// empty row
 #define ERROR_KEY_NOT_FOUND		302		// empty key
 #define ERROR_COLUMN_NOT_FOUND	303		// column not found
+
+// system error
+#define ERROR_MEMORY_LACK		401		// memory shotage
 
 // auth error
