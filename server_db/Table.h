@@ -27,6 +27,10 @@ class Table : public TableContainer {
 	int mIncCount;
 	int mIncPercent;
 	int mUseSwap;
+
+	bool mIsMultiCol;
+	size_t mSingleColDataSize;
+
 public:
 	ColumnInfo mColInfo;
 	static map<string, Table*> mTableMap;
@@ -38,6 +42,7 @@ public:
 		Destroy();
 	};
 
+	static Table *CreateTable( string name, size_t nsize );
 	static Table *CreateTable( string name, ColumnInfo *colinfo );
 	static int DeleteTable( string name );
 	static Table *GetTable( string name );
@@ -54,11 +59,16 @@ public:
 	void Destroy();
 	int Refresh();
 
+	int AddRow( const char *key, const char *value );
+	int AddRow( const char *key, const char *value, unsigned long timeout );
 	int AddRow( Row *row );
 	int AddRow( Row *row, unsigned long timeout );
 	int DelRow( const char * key );
+	int UpdateRow( const char * key, const char *value );
+	int UpdateRow( const char * key, const char *value, int valsize );
 	int UpdateRow( const char * key, const char *col, const char *value );
 	int UpdateRow( const char * key, const char *col, const char *value, int valsize );
+	char *GetRow( const char * key );
 	char *GetRow( const char * key, const char *col );
 
 private:

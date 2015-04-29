@@ -31,7 +31,7 @@ Table::Table()
 	mIncPercent = atoi(value);
 }
 
-Table *Table::CreateTable( string name, ColumnInfo *colinfo )
+Table *Table::CreateTable( string name, size_t nsize )
 {
 	Table *table = new Table;
 	if( table == NULL )
@@ -39,6 +39,7 @@ Table *Table::CreateTable( string name, ColumnInfo *colinfo )
 		gLog.log("new Table error" );
 		return NULL;
 	}
+	table->mIsMultiCol = false;
 	strcpy( table->mTableName, name.c_str() );
 	mTableMap[name] = table;
 
@@ -49,6 +50,34 @@ Table *Table::CreateTable( string name, ColumnInfo *colinfo )
 			gLog.log("mlockall fail!.");
 	}
 
+	table->mColInfo.Clear();
+	table->mSingleColDataSize = nsize;
+
+	if( table->Refresh() != ERROR_OK )
+		return NULL;
+	return table;
+}
+
+Table *Table::CreateTable( string name, ColumnInfo *colinfo )
+{
+	Table *table = new Table;
+	if( table == NULL )
+	{
+		gLog.log("new Table error" );
+		return NULL;
+	}
+	table->mIsMultiCol = true;
+	strcpy( table->mTableName, name.c_str() );
+	mTableMap[name] = table;
+
+	if( gUseSwap == 0 )
+	{
+		int res = mlockall(MCL_CURRENT | MCL_FUTURE);
+		if( res != 0 )
+			gLog.log("mlockall fail!.");
+	}
+
+	table->mColInfo.Clear();
 	Column *col;
 	Column *newcol;
 	list<Column*>::iterator iter2 = colinfo->mColList.begin();
@@ -92,6 +121,51 @@ Table *Table::GetTable( string name )
 	return table;
 }
 
+int Table::AddRow( const char *key, const char *value )
+{
+	return AddRow( key, value, 0 );
+}
+
+int Table::AddRow( const char *key, const char *value, unsigned long timeout )
+{
+	char *prow;
+	uint64_t timehost;
+	if( mIsMultiCol == true )
+		return ERROR_TABLE_TYPE;
+
+	// get extra node
+	if( mExtraRow.size() == 0 )
+	{
+		gLog.log("ExtraRow empty!");
+		return ERROR_MEMORY_LACK;
+	}
+	prow = mExtraRow.front();
+	mExtraRow.pop_front();
+	int pos = 0;
+	strcpy( prow, key );
+	pos += KEY_NAME_SIZE;
+
+	if( timeout != 0 )
+	{
+		timehost = htonll( time(0) + timeout );
+		memcpy( prow + pos, &timehost, TIMEOUT_VALUE_SIZE );
+	}
+	pos += TIMEOUT_VALUE_SIZE;
+
+	// set timeout
+	if( timeout > 0 )
+		TimeoutThread::AddNode( this, key, timeout );
+
+	// todo update
+	int valsize = strlen(value);
+	memcpy( prow + pos, value, valsize );
+	prow[pos + valsize] = '\0';
+
+	// set to map
+	mRowMap[key] = prow;
+	return 0;
+}
+
 int Table::AddRow( Row *row )
 {
 	return AddRow( row, 0 );
@@ -103,6 +177,9 @@ int Table::AddRow( Row *row, unsigned long timeout )
 	Node *node;
 	const char *key;
 	
+	if( mIsMultiCol != true )
+		return ERROR_TABLE_TYPE;
+
 	list<Node*>::iterator iter = row->mNodeList.begin();
 
 	if( row->mNodeList.size() == 0 )
@@ -119,7 +196,7 @@ int Table::AddRow( Row *row, unsigned long timeout )
 	if( mExtraRow.size() == 0 )
 	{
 		gLog.log("ExtraRow empty!");
-		return ERROR_ROW_NOT_FOUND;
+		return ERROR_MEMORY_LACK;
 	}
 	prow = mExtraRow.front();
 	mExtraRow.pop_front();
@@ -138,8 +215,6 @@ int Table::AddRow( Row *row, unsigned long timeout )
 	{
 		timehost = htonll( time(0) + timeout );
 		memcpy( prow + pos, &timehost, TIMEOUT_VALUE_SIZE );
-		//memcpy( prow + pos, &timehost, 4 );
-		//memset( prow + pos+4, 0x00, 4 );
 	}
 	pos += TIMEOUT_VALUE_SIZE;
 
@@ -191,12 +266,36 @@ int Table::DelRow( const char *key )
 	return 0;
 }
 
+char *Table::GetRow( const char *key )
+{
+	char *prow;
+	Node *node;
+
+	if( mIsMultiCol == true )
+		return NULL;
+
+	map<const char *, char*, cmp_str>::iterator iter;
+
+	iter = mRowMap.find( key );
+	if( iter == mRowMap.end() )
+	{
+		gLog.log("Not Found key.");
+		return NULL;
+	}
+	prow = iter->second;
+	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	return prow+pos;
+}
+
 char *Table::GetRow( const char *key, const char *col )
 {
 	char *prow;
 	Node *node;
+
+	if( mIsMultiCol != true )
+		return NULL;
+
 	map<const char *, char*, cmp_str>::iterator iter;
-	list<Node*>::iterator iter2;
 
 	iter = mRowMap.find( key );
 	if( iter == mRowMap.end() )
@@ -211,6 +310,31 @@ char *Table::GetRow( const char *key, const char *col )
 	return NULL;
 }
 
+int Table::UpdateRow( const char *key, const char *value )
+{
+	return UpdateRow( key, value, strlen(value) );
+}
+
+int Table::UpdateRow( const char *key, const char *value, int valsize )
+{
+	char *prow;
+	if( mIsMultiCol == true )
+		return ERROR_TABLE_TYPE;
+
+	map<const char *, char*, cmp_str>::iterator iter;
+	iter = mRowMap.find( key );
+
+	if( iter == mRowMap.end() )
+	{
+		gLog.log("Not Found key.");
+		return ERROR_KEY_NOT_FOUND;
+	}
+	prow = iter->second;
+	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	memcpy( prow + pos, value, valsize );
+	return 0;
+}
+
 int Table::UpdateRow( const char *key, const char *col, const char *value )
 {
 	return UpdateRow( key, col, value, strlen(value) );
@@ -220,6 +344,10 @@ int Table::UpdateRow( const char *key, const char *col, const char *value, int v
 {
 	char *prow;
 	Node *node;
+
+	if( mIsMultiCol != true )
+		return ERROR_TABLE_TYPE;
+
 	map<const char *, char*, cmp_str>::iterator iter;
 	list<Node*>::iterator iter2;
 
@@ -592,15 +720,22 @@ int Table::_incleaseExtraRow( int rowcount)
 {
 	// make extra rows
 	// get row size
-	Column *col;
-	int rowlen = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
-	list<Column*>::iterator iter = mColInfo.mColList.begin();
-	iter ++;
-	while( iter != mColInfo.mColList.end() )
+	int rowlen = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE + sizeof(char *)*2;
+	if( mIsMultiCol == true )
 	{
-		col = *iter;
-		rowlen += col->mSize + 1;	// value + delimiter
+		Column *col;
+		list<Column*>::iterator iter = mColInfo.mColList.begin();
 		iter ++;
+		while( iter != mColInfo.mColList.end() )
+		{
+			col = *iter;
+			rowlen += col->mSize + 1;	// value + delimiter
+			iter ++;
+		}
+	}
+	else
+	{
+		rowlen += mSingleColDataSize;
 	}
 
 	// malloc
