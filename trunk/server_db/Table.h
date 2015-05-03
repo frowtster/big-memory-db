@@ -29,6 +29,7 @@ class Table : public TableContainer {
 	int mUseSwap;
 
 	bool mIsMultiCol;
+	int mSingleColDataType;
 	size_t mSingleColDataSize;
 
 public:
@@ -42,14 +43,16 @@ public:
 		Destroy();
 	};
 
-	static Table *CreateTable( string name, size_t nsize );
-	static Table *CreateTable( string name, ColumnInfo *colinfo );
+	static Table *CreateTable( string name, int type );
 	static int DeleteTable( string name );
 	static Table *GetTable( string name );
 	static void Dump();
 
 	static int Backup( string name, char *filename );
 	static int Restore( string name );
+
+	int SetColumn( int type, size_t nsize );
+	int SetColumn( ColumnInfo *colinfo );
 
 	int RowSize();
 	int RowCount();
@@ -61,15 +64,19 @@ public:
 
 	int AddRow( const char *key, const char *value );
 	int AddRow( const char *key, const char *value, unsigned long timeout );
-	int AddRow( Row *row );
-	int AddRow( Row *row, unsigned long timeout );
+	int AddRow( const char *key, long value );
+	int AddRow( const char *key, long value, unsigned long timeout );
+
+	int AddRow( const char *key, Row *row );
+	int AddRow( const char *key, Row *row, unsigned long timeout );
 	int DelRow( const char * key );
 	int UpdateRow( const char * key, const char *value );
 	int UpdateRow( const char * key, const char *value, int valsize );
 	int UpdateRow( const char * key, const char *col, const char *value );
 	int UpdateRow( const char * key, const char *col, const char *value, int valsize );
-	char *GetRow( const char * key );
-	char *GetRow( const char * key, const char *col );
+	int GetRow( const char * key, char *retval );
+	int GetRow( const char * key, long *retval );
+	int GetRow( const char * key, const char *col, char *retval );
 
 private:
 	int _getColPos(const char *col);

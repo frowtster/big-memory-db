@@ -24,7 +24,10 @@
 #define ERROR_KEY_NOT_FOUND		302		// empty key
 #define ERROR_COLUMN_NOT_FOUND	303		// column not found
 
+// value error
+#define ERROR_VALUE_TYPE		401     // value type mismatch
+
 // system error
-#define ERROR_MEMORY_LACK		401		// memory shotage
+#define ERROR_MEMORY_LACK		501		// memory shotage
 
 // auth error
