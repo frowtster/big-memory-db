@@ -384,6 +384,12 @@ int Table::GetRow( const char *key, const char *col, char *retval )
 	return ERROR_COLUMN_NOT_FOUND;
 }
 
+int Table::GetRow( const char *key, const char *col, long *retval )
+{
+	//todo
+	return ERROR_OK;
+}
+
 int Table::UpdateRow( const char *key, const char *value )
 {
 	return UpdateRow( key, value, strlen(value) );
@@ -440,6 +446,18 @@ int Table::UpdateRow( const char *key, const char *col, const char *value, int v
 	}
 
 	return ERROR_COLUMN_NOT_FOUND;
+}
+
+int Table::IncreaseValue( const char *key )
+{
+	// todo
+	return ERROR_OK;
+}
+
+int Table::DecreaseValue( const char *key )
+{
+	// todo
+	return ERROR_OK;
 }
 
 int Table::RowSize()
