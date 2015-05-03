@@ -58,7 +58,6 @@ int test_std()
 	tab2->GetRow( "key4", value1 );
 	assert( !strcmp( value1, "value4" ) );
 	tab3->GetRow( "key5", &value2 );
-	printf("%ld\n", value2 );
 	assert( value2 == 123 );
 	tab3->GetRow( "key6", &value2 );
 	assert( value2 == 234 );

@@ -340,7 +340,7 @@ int Table::GetRow( const char *key, long *retval )
 
 	if( mIsMultiCol == true )
 		return ERROR_TABLE_TYPE;
-	if( mSingleColDataType != VALUE_TYPE_STRING )
+	if( mSingleColDataType != VALUE_TYPE_NUMBER )
 		return ERROR_VALUE_TYPE;
 
 	map<const char *, char*, cmp_str>::iterator iter;
