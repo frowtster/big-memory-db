@@ -77,6 +77,9 @@ public:
 	int GetRow( const char * key, char *retval );
 	int GetRow( const char * key, long *retval );
 	int GetRow( const char * key, const char *col, char *retval );
+	int GetRow( const char * key, const char *col, long *retval );
+	int IncreaseValue( const char * key );
+	int DecreaseValue( const char * key );
 
 private:
 	int _getColPos(const char *col);
