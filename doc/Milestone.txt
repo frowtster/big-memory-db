@@ -4,8 +4,8 @@ TO-DO
 * single column table (0.5.0)
 	support single column mode, like memcached.
 
-* refactoring (0.5.0)
-	refactoring main singleton instance
+* number value support (0.5.0)
+	number value, increase, decrease
 
 * list store (0.5.0)
 	support list type store, list return, node return
