@@ -242,7 +242,8 @@ int UserClient::_CmdCTAB( OmniPacket *packet )
 		colinfo.AddColumn( colname, coltype, collen );
 		buf = next+2;
 	}
-	tab = Table::CreateTable( param, &colinfo );
+	tab = Table::CreateTable( param, COLUMN_TYPE_MULTI );
+	tab->SetColumn( &colinfo );
 	if( tab == NULL )
 		errCode = ERROR_MEMALOCK_FAIL;
 
@@ -312,11 +313,13 @@ int UserClient::_CmdIROW( OmniPacket *packet )
 {
 	int errCode = ERROR_OK;
 	char ret[BUFLEN];
-	char param[NODELEN];
+	char param1[NODELEN];
+	char param2[NODELEN];
 
 	PARSE_TAG_INIT( packet->mHeader );
-	PARSE_TAG_NEXT( packet->mHeader, param );
-	gLog.log("Insert Row timeout %s", param );
+	PARSE_TAG_NEXT( packet->mHeader, param1 );
+	PARSE_TAG_NEXT( packet->mHeader, param2 );
+	gLog.log("Insert Row key:%s timeout %s", param1, param2 );
 
 	Row row;
 	char *buf = packet->mBody;
@@ -348,7 +351,7 @@ int UserClient::_CmdIROW( OmniPacket *packet )
 		row.AddVal( colname, colvalue );
 		buf = next+2;
 	}
-	mTable->AddRow( &row, atoi(param) );
+	mTable->AddRow( param1, &row, atoi(param2) );
 	Table::Dump();
 
 	sprintf( ret, "IROW %lu %d 0\r\n", packet->mTrid, errCode );
@@ -378,7 +381,7 @@ int UserClient::_CmdSROW( OmniPacket *packet )
 	PARSE_TAG_NEXT( packet->mHeader, param2 );
 	gLog.log("Select Row" );
 
-	value = mTable->GetRow( param1, param2 );
+	mTable->GetRow( param1, param2, value );
 
 	sprintf( ret, "SROW %lu %d %lu\r\n", packet->mTrid, errCode, strlen(value) );
 	WritePacket( ret, strlen(ret) );

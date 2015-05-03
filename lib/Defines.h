@@ -16,6 +16,12 @@
 #define QUERYLEN 512
 #define CHATKEYLEN 10
 
+#define COLUMN_TYPE_SINGLE	0x00
+#define COLUMN_TYPE_MULTI	0x01
+
+#define VALUE_TYPE_STRING	0x10
+#define VALUE_TYPE_NUMBER	0x11
+
 #define PARSE_TAG_INIT( buffer )	\
 	int nPos = 0;					\
 	char *cTag;						\

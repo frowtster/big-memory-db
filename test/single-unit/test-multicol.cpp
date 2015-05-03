@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string>
 
+#include "Defines.h"
 #include "Table.h"
 #include "Column.h"
 #include "Row.h"
@@ -23,57 +24,68 @@ int test_std()
 	Table *tab1, *tab2;
 	ColumnInfo colinfo;
 	Row row;
+	char value1[100];
 
 	// create table1
 	colinfo.Clear();
 	colinfo.AddColumn("col1",1,1);
 	colinfo.AddColumn("col2",2,2);
 	colinfo.AddColumn("col3",4,5);
-	tab1 = Table::CreateTable("table1", &colinfo);
+	tab1 = Table::CreateTable("table1", COLUMN_TYPE_MULTI );
+	tab1->SetColumn( &colinfo );
 	colinfo.Clear();
 
 	row.AddVal("col1", "1");
 	row.AddVal("col2", "12");
 	row.AddVal("col3", "432");
-	tab1->AddRow( &row );
+	tab1->AddRow( "key1", &row );
 	row.Clear();
 	row.AddVal("col1", "2");
 	row.AddVal("col2", "23");
 	row.AddVal("col3", "234");
-	tab1->AddRow( &row );
+	tab1->AddRow( "key2", &row );
 
 	// create table2
 	colinfo.AddColumn("col2-1",1,2);
 	colinfo.AddColumn("col2-2",4,5);
-	tab2 = Table::CreateTable("table2", &colinfo);
+	tab2 = Table::CreateTable("table2", COLUMN_TYPE_MULTI);
+	tab2->SetColumn( &colinfo);
 	colinfo.Clear();
 
 	row.Clear();
 	row.AddVal("col2-1", "1");
 	row.AddVal("col2-2", "45");
-	tab2->AddRow( &row );
+	tab2->AddRow( "key3", &row );
 	row.Clear();
 	row.AddVal("col2-1", "2");
 	row.AddVal("col2-2", "56");
-	tab2->AddRow( &row );
+	tab2->AddRow( "key4", &row );
 
 	Table::Dump();
 
 	// get row
-	assert( !strcmp(tab1->GetRow( "1", "col1" ), "1" ) );
-	assert( !strcmp(tab1->GetRow( "1", "col2" ), "12" ) );
-	assert( !strcmp(tab1->GetRow( "1", "col3" ), "432" ) );
-	assert( !strcmp(tab1->GetRow( "2", "col2" ), "23" ) );
-	assert( !strcmp(tab1->GetRow( "2", "col3" ), "234" ) );
-	assert( !strcmp(tab2->GetRow( "1", "col2-2" ), "45" ) );
-	assert( !strcmp(tab2->GetRow( "2", "col2-2" ), "56" ) );
+	tab1->GetRow( "key1", "col1", value1 );
+	assert( !strcmp( value1, "1" ) );
+	tab1->GetRow( "key1", "col2", value1 );
+	assert( !strcmp( value1, "12" ) );
+	tab1->GetRow( "key1", "col3", value1 );
+	assert( !strcmp( value1, "432" ) );
+	tab1->GetRow( "key2", "col2", value1 );
+	assert( !strcmp( value1, "23" ) );
+	tab1->GetRow( "key2", "col3", value1 );
+	assert( !strcmp( value1, "234" ) );
+	tab2->GetRow( "key3", "col2-2", value1 );
+	assert( !strcmp( value1, "45" ) );
+	tab2->GetRow( "key4", "col2-2", value1 );
+	assert( !strcmp( value1, "56" ) );
 	
 	// update row
-	tab1->UpdateRow( "1", "col3", "456" );
-	assert( !strcmp(tab1->GetRow( "1", "col3" ), "456" ) );
+	tab1->UpdateRow( "key1", "col3", "456" );
+	tab1->GetRow( "key1", "col3", value1 );
+	assert( !strcmp( value1, "456" ) );
 
 	// del row
-	tab1->DelRow( "2" );
+	tab1->DelRow( "key2" );
 
 	Table::Dump();
 

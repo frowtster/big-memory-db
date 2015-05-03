@@ -62,8 +62,8 @@ Use Table
 ------------------------------
 
 Insert Row
-	-> IROW [trid] [timeout:sec] [body size]
-		[column name] [key value]
+	-> IROW [trid] [key] [timeout:sec] [body size]
+		[column name] [value]
 		[column name] [value]
 		...
 	<- IROW [trid] [error code] 0
