@@ -19,29 +19,29 @@ int gUseSwap;
 Log gLog;
 map<string, Table*> Table::mTableMap;
 
-int test_std()
+int test_single_value()
 {
 	Table *tab1, *tab2, *tab3;
 	char value1[100];
 	long value2;
 
 	// create table1
-	tab1 = Table::CreateTable("table1", COLUMN_TYPE_SINGLE );
-	tab1->SetColumn( VALUE_TYPE_STRING, 10 );
+	tab1 = Table::CreateTable("table1", TYPE_SINGLE_COLUMN );
+	tab1->SetColumn( TYPE_STRING, 10 );
 
 	tab1->AddRow( "key1", "value1" );
 	tab1->AddRow( "key2", "value2" );
 
 	// create table2
-	tab2 = Table::CreateTable("table2", COLUMN_TYPE_SINGLE );
-	tab2->SetColumn( VALUE_TYPE_STRING, 20 );
+	tab2 = Table::CreateTable("table2", TYPE_SINGLE_COLUMN );
+	tab2->SetColumn( TYPE_STRING, 20 );
 
 	tab2->AddRow( "key3", "value3" );
 	tab2->AddRow( "key4", "value4" );
 
 	// create table3
-	tab3 = Table::CreateTable("table3", COLUMN_TYPE_SINGLE );
-	tab3->SetColumn( VALUE_TYPE_NUMBER, 10 );
+	tab3 = Table::CreateTable("table3", TYPE_SINGLE_COLUMN );
+	tab3->SetColumn( TYPE_NUMBER, 10 );
 
 	tab3->AddRow( "key5", 123 );
 	tab3->AddRow( "key6", 234 );
@@ -74,6 +74,38 @@ int test_std()
 
 	Table::DeleteTable("table1");
 	Table::DeleteTable("table2");
+	Table::DeleteTable("table3");
+	return 0;
+}
+
+int test_multi_value()
+{
+	Table *tab1;
+	char value1[100];
+
+	// create table1
+	tab1 = Table::CreateTable("table1", TYPE_SINGLE_COLUMN | TYPE_MULTI_VALUE );
+	tab1->SetColumn( TYPE_STRING, 10 );
+
+	tab1->AddRow( "key1", "value1" );
+	tab1->AddRow( "key1", "value2" );
+	tab1->AddRow( "key1", "value3" );
+
+	tab1->AddRow( "key2", "value3" );
+	tab1->AddRow( "key2", "value4" );
+
+	tab1->GetRow( "key1", value1 );
+	assert( !strcmp( value1, "value1" ) );
+	tab1->GetRow( "key1", value1 );
+	assert( !strcmp( value1, "value2" ) );
+	tab1->GetRow( "key1", value1 );
+	assert( !strcmp( value1, "value3" ) );
+	tab1->GetRow( "key2", value1 );
+	assert( !strcmp( value1, "value3" ) );
+	tab1->GetRow( "key2", value1 );
+	assert( !strcmp( value1, "value4" ) );
+
+	Table::DeleteTable("table1");
 	return 0;
 }
 
@@ -90,7 +122,8 @@ int main()
 
 	//while( true )
 	{
-		test_std();
+		test_single_value();
+		test_multi_value();
 		usleep(1000);
 	}
 

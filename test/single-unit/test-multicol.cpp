@@ -31,7 +31,7 @@ int test_std()
 	colinfo.AddColumn("col1",1,1);
 	colinfo.AddColumn("col2",2,2);
 	colinfo.AddColumn("col3",4,5);
-	tab1 = Table::CreateTable("table1", COLUMN_TYPE_MULTI );
+	tab1 = Table::CreateTable("table1", TYPE_MULTI_COLUMN );
 	tab1->SetColumn( &colinfo );
 	colinfo.Clear();
 
@@ -48,7 +48,7 @@ int test_std()
 	// create table2
 	colinfo.AddColumn("col2-1",1,2);
 	colinfo.AddColumn("col2-2",4,5);
-	tab2 = Table::CreateTable("table2", COLUMN_TYPE_MULTI);
+	tab2 = Table::CreateTable("table2", TYPE_MULTI_COLUMN );
 	tab2->SetColumn( &colinfo);
 	colinfo.Clear();
 

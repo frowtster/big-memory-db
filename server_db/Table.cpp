@@ -40,11 +40,16 @@ Table *Table::CreateTable( string name, int type )
 		gLog.log("new Table error" );
 		return NULL;
 	}
-	if( type & COLUMN_TYPE_MULTI )
+	if( type & TYPE_MULTI_COLUMN )
 		table->mIsMultiCol = true;
 	else
 		table->mIsMultiCol = false;
 
+	if( type & TYPE_MULTI_VALUE )
+		table->mIsMultiValue = true;
+	else
+		table->mIsMultiValue = false;
+  
 	strcpy( table->mTableName, name.c_str() );
 	mTableMap[name] = table;
 	if( gUseSwap == 0 )
@@ -96,6 +101,12 @@ int Table::SetColumn( ColumnInfo *colinfo )
 	return ERROR_OK;
 }
 
+// todo
+int Table::DeleteTable( Table *tab )
+{
+	return ERROR_OK;
+}
+
 int Table::DeleteTable( string name )
 {
 	gLog.log("DeleteTable");
@@ -129,11 +140,22 @@ int Table::AddRow( const char *key, const char *value, unsigned long timeout )
 {
 	char *prow;
 	uint64_t timehost;
+	bool bnokey = true;
 
 	if( mIsMultiCol == true )
 		return ERROR_TABLE_TYPE;
-	if( mSingleColDataType != VALUE_TYPE_STRING )
+	if( mSingleColDataType != TYPE_STRING )
 		return ERROR_VALUE_TYPE;
+
+	// if exist and single value, error
+	map<const char *, char*, cmp_str>::iterator iter;
+	iter = mRowMap.find( key );
+	if( iter != mRowMap.end() )
+   	{
+		if( mIsMultiValue != true )
+			return ERROR_VALUE_EXIST;
+		bnokey = false;
+   	}
 
 	// get extra node
 	if( mExtraRow.size() == 0 )
@@ -153,6 +175,7 @@ int Table::AddRow( const char *key, const char *value, unsigned long timeout )
 		memcpy( prow + pos, &timehost, TIMEOUT_VALUE_SIZE );
 	}
 	pos += TIMEOUT_VALUE_SIZE;
+	pos += sizeof( char *)*2;
 
 	// set timeout
 	if( timeout > 0 )
@@ -162,8 +185,30 @@ int Table::AddRow( const char *key, const char *value, unsigned long timeout )
 	memcpy( prow + pos, value, valsize );
 	prow[pos + valsize] = '\0';
 
-	// set to map
-	mRowMap[key] = prow;
+	if( bnokey == true )
+	{
+		// set to map
+		_setPrev( prow, NULL );
+		_setNext( prow, NULL );
+		mRowMap[key] = prow;
+	}
+	else
+	{
+		if( mIsMultiValue == true )
+		{
+			// add extra. and link
+			char *pcurr = iter->second;
+			char *pnext = _getNext( pcurr );
+			while ( pnext != NULL )
+			{
+				pcurr = pnext;
+				pnext = _getNext( pcurr );
+			}
+			_setNext( pcurr, prow );
+			_setPrev( prow, pcurr );
+			_setNext( prow, NULL );
+		}
+	}
 	return 0;
 }
 
@@ -180,7 +225,7 @@ int Table::AddRow( const char *key, long value, unsigned long timeout )
 	if( mIsMultiCol == true )
 		return ERROR_TABLE_TYPE;
 
-	if( mSingleColDataType != VALUE_TYPE_NUMBER )
+	if( mSingleColDataType != TYPE_NUMBER )
 		return ERROR_VALUE_TYPE;
 
 	// get extra node
@@ -201,6 +246,7 @@ int Table::AddRow( const char *key, long value, unsigned long timeout )
 		memcpy( prow + pos, &timehost, TIMEOUT_VALUE_SIZE );
 	}
 	pos += TIMEOUT_VALUE_SIZE;
+	pos += sizeof( char *)*2;
 
 	// set timeout
 	if( timeout > 0 )
@@ -259,6 +305,7 @@ int Table::AddRow( const char *key, Row *row, unsigned long timeout )
 		memcpy( prow + pos, &timehost, TIMEOUT_VALUE_SIZE );
 	}
 	pos += TIMEOUT_VALUE_SIZE;
+	pos += sizeof( char *)*2;
 
 	// set timeout
 	if( timeout > 0 )
@@ -306,6 +353,17 @@ int Table::DelRow( const char *key )
 	mExtraRow.push_back( prow );
 	mRowMap.erase( iter );
 
+	if( mIsMultiValue == true )
+	{
+		char *pcurr = prow;
+		char *pnext = _getNext( pcurr );
+		while ( pnext != NULL )
+		{
+			pcurr = pnext;
+			pnext = _getNext( pcurr );
+			mExtraRow.push_back( pcurr );
+		}
+	}
 	return 0;
 }
 
@@ -315,8 +373,28 @@ int Table::GetRow( const char *key, char *retval )
 
 	if( mIsMultiCol == true )
 		return ERROR_TABLE_TYPE;
-	if( mSingleColDataType != VALUE_TYPE_STRING )
+	if( mSingleColDataType != TYPE_STRING )
 		return ERROR_VALUE_TYPE;
+
+	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	pos += sizeof( char *)*2;
+
+	if( mIsMultiValue == true )
+	{
+		if( lastSelRow != NULL )
+		{
+			if( !strcmp( key, lastSelKey ) )
+			{
+				char *pcurr = _getNext( lastSelRow );
+				lastSelRow = pcurr;
+				if( pcurr != NULL )
+				{
+					memcpy( retval, pcurr+pos, mSingleColDataSize );
+					return ERROR_OK;
+				}
+			}
+		}
+	}
 
 	map<const char *, char*, cmp_str>::iterator iter;
 
@@ -328,9 +406,14 @@ int Table::GetRow( const char *key, char *retval )
 	}
 	prow = iter->second;
 
-	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
 	memcpy( retval, prow+pos, mSingleColDataSize );
 	retval[mSingleColDataSize] = '\0';
+
+	if( mIsMultiValue == true )
+	{
+		strcpy( lastSelKey, key );
+		lastSelRow = prow;
+	}
 	return ERROR_OK;
 }
 
@@ -340,7 +423,7 @@ int Table::GetRow( const char *key, long *retval )
 
 	if( mIsMultiCol == true )
 		return ERROR_TABLE_TYPE;
-	if( mSingleColDataType != VALUE_TYPE_NUMBER )
+	if( mSingleColDataType != TYPE_NUMBER )
 		return ERROR_VALUE_TYPE;
 
 	map<const char *, char*, cmp_str>::iterator iter;
@@ -354,6 +437,8 @@ int Table::GetRow( const char *key, long *retval )
 	prow = iter->second;
 
 	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	pos += sizeof( char *)*2;
+
 	memcpy( retval, prow+pos, sizeof(uint64_t) );
 	return ERROR_OK;
 }
@@ -401,6 +486,9 @@ int Table::UpdateRow( const char *key, const char *value, int valsize )
 	if( mIsMultiCol == true )
 		return ERROR_TABLE_TYPE;
 
+	if( mIsMultiValue == true )
+		return ERROR_TABLE_TYPE;
+
 	map<const char *, char*, cmp_str>::iterator iter;
 	iter = mRowMap.find( key );
 
@@ -411,7 +499,24 @@ int Table::UpdateRow( const char *key, const char *value, int valsize )
 	}
 	prow = iter->second;
 	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	pos += sizeof( char *)*2;
+
 	memcpy( prow + pos, value, valsize );
+	return 0;
+}
+
+// todo
+int Table::UpdateRow( const char * key, long value )
+{
+	if( mIsMultiCol == true )
+		return ERROR_TABLE_TYPE;
+
+	if( mIsMultiCol == true )
+		return ERROR_TABLE_TYPE;
+
+	if( mIsMultiValue == true )
+		return ERROR_TABLE_TYPE;
+
 	return 0;
 }
 
@@ -455,6 +560,18 @@ int Table::IncreaseValue( const char *key )
 }
 
 int Table::DecreaseValue( const char *key )
+{
+	// todo
+	return ERROR_OK;
+}
+
+int Table::IncreaseValue( const char *key, const char *col )
+{
+	// todo
+	return ERROR_OK;
+}
+
+int Table::DecreaseValue( const char *key, const char *col )
 {
 	// todo
 	return ERROR_OK;
@@ -648,7 +765,7 @@ int Table::Restore( string name )
 			return ERROR_FILE_FORMAT;
 		}
 	}
-	table = Table::CreateTable( table_name, COLUMN_TYPE_MULTI );
+	table = Table::CreateTable( table_name, TYPE_MULTI_COLUMN );
 	table->SetColumn( &colinfo );
 	prow = (char*)malloc(size+1);
 
@@ -788,6 +905,8 @@ int Table::_getColPos(const char *name)
 
 	//iter ++;
 	pos += KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	pos += sizeof( char *)*2;
+
 	while( iter != mColInfo.mColList.end() )
 	{
 		col = *iter;
@@ -803,6 +922,8 @@ int Table::_getColPos(const char *name)
 int Table::_getRowLen()
 {
 	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	pos += sizeof( char *)*2;
+
 	Column *col;
 	list<Column*>::iterator iter = mColInfo.mColList.begin();
 	iter ++;

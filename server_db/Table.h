@@ -29,9 +29,12 @@ class Table : public TableContainer {
 	int mUseSwap;
 
 	bool mIsMultiCol;
+	bool mIsMultiValue;
 	int mSingleColDataType;
 	size_t mSingleColDataSize;
 
+	char lastSelKey[KEY_NAME_SIZE];
+	char *lastSelRow;
 public:
 	ColumnInfo mColInfo;
 	static map<string, Table*> mTableMap;
@@ -45,6 +48,8 @@ public:
 
 	static Table *CreateTable( string name, int type );
 	static int DeleteTable( string name );
+	static int DeleteTable( Table * );
+
 	static Table *GetTable( string name );
 	static void Dump();
 
@@ -62,24 +67,31 @@ public:
 	void Destroy();
 	int Refresh();
 
+	// single column
 	int AddRow( const char *key, const char *value );
 	int AddRow( const char *key, const char *value, unsigned long timeout );
 	int AddRow( const char *key, long value );
 	int AddRow( const char *key, long value, unsigned long timeout );
-
-	int AddRow( const char *key, Row *row );
-	int AddRow( const char *key, Row *row, unsigned long timeout );
-	int DelRow( const char * key );
 	int UpdateRow( const char * key, const char *value );
 	int UpdateRow( const char * key, const char *value, int valsize );
-	int UpdateRow( const char * key, const char *col, const char *value );
-	int UpdateRow( const char * key, const char *col, const char *value, int valsize );
+	int UpdateRow( const char * key, long value );
 	int GetRow( const char * key, char *retval );
 	int GetRow( const char * key, long *retval );
-	int GetRow( const char * key, const char *col, char *retval );
-	int GetRow( const char * key, const char *col, long *retval );
 	int IncreaseValue( const char * key );
 	int DecreaseValue( const char * key );
+
+	// multi column
+	int AddRow( const char *key, Row *row );
+	int AddRow( const char *key, Row *row, unsigned long timeout );
+	int UpdateRow( const char * key, const char *col, const char *value );
+	int UpdateRow( const char * key, const char *col, const char *value, int valsize );
+	int GetRow( const char * key, const char *col, char *retval );
+	int GetRow( const char * key, const char *col, long *retval );
+	int IncreaseValue( const char * key, const char *col );
+	int DecreaseValue( const char * key, const char *col );
+
+	// common
+	int DelRow( const char * key );
 
 private:
 	int _getColPos(const char *col);

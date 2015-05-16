@@ -242,7 +242,7 @@ int UserClient::_CmdCTAB( OmniPacket *packet )
 		colinfo.AddColumn( colname, coltype, collen );
 		buf = next+2;
 	}
-	tab = Table::CreateTable( param, COLUMN_TYPE_MULTI );
+	tab = Table::CreateTable( param, TYPE_MULTI_COLUMN );
 	tab->SetColumn( &colinfo );
 	if( tab == NULL )
 		errCode = ERROR_MEMALOCK_FAIL;
