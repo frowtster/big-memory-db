@@ -3,6 +3,12 @@
 int NewLineSize(char *buf);
 void RandomString( char *buf, int length );
 
+void _setNext( char *row, char *addr );
+void _setPrev( char *row, char *addr );
+
+char *_getNext( char *row );
+char *_getPrev( char *row );
+
 #ifndef htonll
 #define htonll(x) \
 	((((x) & 0xff00000000000000LL) >> 56) | \

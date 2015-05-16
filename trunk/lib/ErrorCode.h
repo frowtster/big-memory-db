@@ -26,6 +26,7 @@
 
 // value error
 #define ERROR_VALUE_TYPE		401     // value type mismatch
+#define ERROR_VALUE_EXIST		402     // value exist
 
 // system error
 #define ERROR_MEMORY_LACK		501		// memory shotage

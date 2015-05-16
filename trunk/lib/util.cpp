@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include "Constants.h"
 
 int NewLineSize(char *buf)
 {
@@ -26,5 +27,33 @@ void RandomString( char *buf, int length )
 		buf[i] = alphanum[random() % stringLength];
 	}
 	buf[length] = '\0';
+}
+
+void _setNext( char *row, char *addr )
+{
+	int rowlen = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE + sizeof(char *);
+	long *buf = (long*)(row+rowlen);
+	*buf = (long)addr;
+}
+
+void _setPrev( char *row, char *addr )
+{
+	int rowlen = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	long *buf = (long*)(row+rowlen);
+	*buf = (long)addr;
+}
+
+char *_getNext( char *row )
+{
+	int rowlen = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE + sizeof(char *);
+	long *buf = (long*)(row+rowlen);
+	return (char*)*buf;
+}
+
+char *_getPrev( char *row )
+{
+	int rowlen = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	long *buf = (long*)(row+rowlen);
+	return (char*)*buf;
 }
 
