@@ -1,4 +1,5 @@
 all:
+	make -C ../../lib/
 	make -C ../../server_db/
 	c++  -c -g -ggdb -I /usr/include -I /opt/local/include -I ../../lib -I . -I ../../server_db -c -o test-singlecol.o test-singlecol.cpp
 	g++ -o test-singlecol -g -ggdb test-singlecol.o ../../server_db/CMakeFiles/bmdb.dir/Table.cpp.o -L /usr/lib -L /opt/local/lib -L /usr/local/lib -L ../../lib -lBmdb -levent -lpthread

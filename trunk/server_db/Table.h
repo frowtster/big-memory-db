@@ -35,6 +35,11 @@ class Table : public TableContainer {
 
 	char lastSelKey[KEY_NAME_SIZE];
 	char *lastSelRow;
+
+	char mFetchName[KEY_NAME_SIZE];
+	char mFetchValue[KEY_NAME_SIZE];
+	char mFetchOp[3];
+
 public:
 	ColumnInfo mColInfo;
 	static map<string, Table*> mTableMap;
@@ -92,6 +97,7 @@ public:
 
 	// common
 	int DelRow( const char * key );
+	int SetFetchCondition( const char * cond );
 
 private:
 	int _getColPos(const char *col);

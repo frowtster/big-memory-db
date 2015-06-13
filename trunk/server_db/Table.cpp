@@ -221,12 +221,23 @@ int Table::AddRow( const char *key, long value, unsigned long timeout )
 {
 	char *prow;
 	uint64_t timehost;
+	bool bnokey = true;
 	uint64_t valuehost;
+
 	if( mIsMultiCol == true )
 		return ERROR_TABLE_TYPE;
-
 	if( mSingleColDataType != TYPE_NUMBER )
 		return ERROR_VALUE_TYPE;
+
+	// if exist and single value, error
+	map<const char *, char*, cmp_str>::iterator iter;
+	iter = mRowMap.find( key );
+	if( iter != mRowMap.end() )
+   	{
+		if( mIsMultiValue != true )
+			return ERROR_VALUE_EXIST;
+		bnokey = false;
+   	}
 
 	// get extra node
 	if( mExtraRow.size() == 0 )
@@ -256,8 +267,30 @@ int Table::AddRow( const char *key, long value, unsigned long timeout )
 	int valsize = sizeof(uint64_t);	// todo
 	memcpy( prow + pos, &value, valsize );
 
-	// set to map
-	mRowMap[key] = prow;
+	if( bnokey == true )
+	{
+		// set to map
+		_setPrev( prow, NULL );
+		_setNext( prow, NULL );
+		mRowMap[key] = prow;
+	}
+	else
+	{
+		if( mIsMultiValue == true )
+		{
+			// add extra. and link
+			char *pcurr = iter->second;
+			char *pnext = _getNext( pcurr );
+			while ( pnext != NULL )
+			{
+				pcurr = pnext;
+				pnext = _getNext( pcurr );
+			}
+			_setNext( pcurr, prow );
+			_setPrev( prow, pcurr );
+			_setNext( prow, NULL );
+		}
+	}
 	return 0;
 }
 
@@ -337,6 +370,35 @@ int Table::AddRow( const char *key, Row *row, unsigned long timeout )
 	// set to map
 	mRowMap[key] = prow;
 	return 0;
+}
+
+int Table::SetFetchCondition( const char *cond )
+{
+	char fetchParam1[KEY_NAME_SIZE];
+	char fetchParam2[KEY_NAME_SIZE];
+	char fetchOp[3];
+
+	int ret = parseFetchCondition( cond, fetchParam1, fetchParam2, fetchOp );
+	if( ret != ERROR_OK )
+		return ret;
+
+	// name check;
+	if( _getColPos( fetchParam1 ) > 0 )
+	{
+		strcpy( mFetchName, fetchParam1 );
+		strcpy( mFetchValue, fetchParam2 );
+		strcpy( mFetchOp, fetchOp );
+		return ERROR_OK;
+	}
+	if( _getColPos( fetchParam2 ) > 0 )
+	{
+		strcpy( mFetchName, fetchParam2 );
+		strcpy( mFetchValue, fetchParam1 );
+		invertOperator( fetchOp );
+		strcpy( mFetchOp, fetchOp );
+		return ERROR_OK;
+	}
+	return ERROR_COLUMN_NOT_FOUND;
 }
 
 int Table::DelRow( const char *key )
@@ -426,6 +488,26 @@ int Table::GetRow( const char *key, long *retval )
 	if( mSingleColDataType != TYPE_NUMBER )
 		return ERROR_VALUE_TYPE;
 
+	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
+	pos += sizeof( char *)*2;
+
+	if( mIsMultiValue == true )
+	{
+		if( lastSelRow != NULL )
+		{
+			if( !strcmp( key, lastSelKey ) )
+			{
+				char *pcurr = _getNext( lastSelRow );
+				lastSelRow = pcurr;
+				if( pcurr != NULL )
+				{
+					memcpy( retval, pcurr+pos, sizeof(uint64_t) );
+					return ERROR_OK;
+				}
+			}
+		}
+	}
+
 	map<const char *, char*, cmp_str>::iterator iter;
 
 	iter = mRowMap.find( key );
@@ -436,10 +518,13 @@ int Table::GetRow( const char *key, long *retval )
 	}
 	prow = iter->second;
 
-	int pos = KEY_NAME_SIZE + TIMEOUT_VALUE_SIZE;
-	pos += sizeof( char *)*2;
-
 	memcpy( retval, prow+pos, sizeof(uint64_t) );
+
+	if( mIsMultiValue == true )
+	{
+		strcpy( lastSelKey, key );
+		lastSelRow = prow;
+	}
 	return ERROR_OK;
 }
 
