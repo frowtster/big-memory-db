@@ -1,14 +1,5 @@
 #pragma once
 
-int NewLineSize(char *buf);
-void RandomString( char *buf, int length );
-
-void _setNext( char *row, char *addr );
-void _setPrev( char *row, char *addr );
-
-char *_getNext( char *row );
-char *_getPrev( char *row );
-
 #ifndef htonll
 #define htonll(x) \
 	((((x) & 0xff00000000000000LL) >> 56) | \
@@ -31,3 +22,31 @@ char *_getPrev( char *row );
 	(((x) & 0x00FF000000000000) >> 40) | \
 	(((x) & 0xFF00000000000000) >> 56))
 #endif
+
+static const char *OPERATOR[] = 
+{
+	"<=",
+	">=",
+	"=<",
+	"=>",
+	"==",
+	"<",
+	">",
+	"="
+};
+
+int NewLineSize(char *buf);
+void RandomString( char *buf, int length );
+
+void _setNext( char *row, char *addr );
+void _setPrev( char *row, char *addr );
+
+char *_getNext( char *row );
+char *_getPrev( char *row );
+
+char *ltrim( char *s );
+char *rtrim( char *s );
+char *trim( char *s );
+
+int parseFetchCondition( const char *cond, char *fetchParam1, char *fetchParam2, char *fetchOperator );
+char *invertOperator( char *s );

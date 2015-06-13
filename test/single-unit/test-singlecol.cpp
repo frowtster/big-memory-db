@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string>
 
+#include "util.h"
 #include "Defines.h"
 #include "Table.h"
 #include "Column.h"
@@ -82,6 +83,7 @@ int test_multi_value()
 {
 	Table *tab1;
 	char value1[100];
+	long value2;
 
 	// create table1
 	tab1 = Table::CreateTable("table1", TYPE_SINGLE_COLUMN | TYPE_MULTI_VALUE );
@@ -106,6 +108,49 @@ int test_multi_value()
 	assert( !strcmp( value1, "value4" ) );
 
 	Table::DeleteTable("table1");
+
+	// create table2
+	tab1 = Table::CreateTable("table1", TYPE_SINGLE_COLUMN | TYPE_MULTI_VALUE );
+	tab1->SetColumn( TYPE_NUMBER, 10 );
+
+	tab1->AddRow( "key1", 2 );
+	tab1->AddRow( "key1", 3 );
+	tab1->AddRow( "key1", 4 );
+
+	tab1->GetRow( "key1", &value2 );
+	assert( value2 == 2 );
+	tab1->GetRow( "key1", &value2 );
+	assert( value2 == 3 );
+	tab1->GetRow( "key1", &value2 );
+	assert( value2 == 4 );
+
+	Table::DeleteTable("table1");
+
+	return 0;
+}
+
+int test_fetch_condition()
+{
+	Table *tab1;
+	char value1[100];
+	long value2;
+
+	// create table1
+	tab1 = Table::CreateTable("table1", TYPE_SINGLE_COLUMN | TYPE_MULTI_VALUE );
+	tab1->SetColumn( TYPE_NUMBER, 10 );
+
+	tab1->AddRow( "key1", 2 );
+	tab1->AddRow( "key1", 3 );
+	tab1->AddRow( "key1", 4 );
+	tab1->AddRow( "key1", 5 );
+
+	tab1->SetFetchCondition( "value > 3" );
+
+	tab1->GetRow( "key1", &value2 );
+	assert( value2 == 4 );
+	tab1->GetRow( "key1", &value2 );
+	assert( value2 == 5 );
+
 	return 0;
 }
 
@@ -124,6 +169,7 @@ int main()
 	{
 		test_single_value();
 		test_multi_value();
+		test_fetch_condition();
 		usleep(1000);
 	}
 

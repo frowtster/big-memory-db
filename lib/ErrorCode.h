@@ -6,6 +6,7 @@
 // system error
 #define ERROR_MEMALOCK_FAIL		101		// memory alloc fail
 #define ERROR_INVALID_COMMAND	102		// invalid command
+
 #define ERROR_FILE_NOT_CREATE	103		// fopen error
 #define ERROR_FILE_NOT_OPEN		104		// fopen error
 #define ERROR_FILE_NOT_READ		105		// fread error
@@ -30,5 +31,8 @@
 
 // system error
 #define ERROR_MEMORY_LACK		501		// memory shotage
+
+// parameter error
+#define ERROR_PARAMETER			601		// parameter error
 
 // auth error

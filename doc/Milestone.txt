@@ -10,6 +10,9 @@ TO-DO
 * list store (0.5.0)
 	support list type store, list return, node return
 
+* simple SQL support (0.5.0)
+	supprt simple WHERE clauses.
+
 * authentication
 	support AES 128bit authentication
 	also, support non-authentication.
