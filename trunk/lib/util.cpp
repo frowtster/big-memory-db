@@ -119,7 +119,39 @@ int parseFetchCondition( const char *cond, char *fetchParam1, char *fetchParam2,
 	trim(fetchParam1);
 	trim(fetchParam2);
 
+	if( strcmp( fetchOperator, "=<" ) == 0 )
+		strcpy( fetchOperator, "<=" );
+	if( strcmp( fetchOperator, "=>" ) == 0 )
+		strcpy( fetchOperator, ">=" );
+
 	return ERROR_OK;
+}
+
+bool checkConditionSingleNum( const char *value, const char *fetchValue, const char *fetchOp )
+{
+	if( fetchValue[0] == '\0' || fetchOp[0] == '\0' )
+		return false;
+
+	long lval, fval;
+	memcpy( &lval, value, sizeof(uint64_t) );
+	fval = atol( fetchValue );
+
+	if( lval == fval )
+	{
+		if( fetchOp[0] == '=' )
+			return true;
+	}
+	else if( lval > fval )
+	{
+		if( fetchOp[0] == '>' )
+			return true;
+	}
+	else if( lval < fval )
+	{
+		if( fetchOp[0] == '<' )
+			return true;
+	}
+	return false;
 }
 
 char *invertOperator( char *s )
@@ -131,11 +163,6 @@ char *invertOperator( char *s )
 	pos = strchr( s, '>' );
 	if( pos != NULL )
 		*pos = '<';
-
-	if( strcmp( s, "=<" ) == 0 )
-		strcpy( s, "<=" );
-	if( strcmp( s, "=>" ) == 0 )
-		strcpy( s, ">=" );
 
 	return s;
 }
