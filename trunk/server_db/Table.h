@@ -97,10 +97,13 @@ public:
 
 	// common
 	int DelRow( const char * key );
-	int SetFetchCondition( const char * cond );
+	int FetchConditionSet( const char * cond );
 
 private:
 	int _getColPos(const char *col);
 	int _getRowLen();
 	int _incleaseExtraRow( int rowcount );
+
+	int _fetchConditionCheck( const char *col, long value );
+
 };

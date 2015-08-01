@@ -372,7 +372,7 @@ int Table::AddRow( const char *key, Row *row, unsigned long timeout )
 	return 0;
 }
 
-int Table::SetFetchCondition( const char *cond )
+int Table::FetchConditionSet( const char *cond )
 {
 	char fetchParam1[KEY_NAME_SIZE];
 	char fetchParam2[KEY_NAME_SIZE];
