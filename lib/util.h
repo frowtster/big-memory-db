@@ -49,4 +49,5 @@ char *rtrim( char *s );
 char *trim( char *s );
 
 int parseFetchCondition( const char *cond, char *fetchParam1, char *fetchParam2, char *fetchOperator );
+bool checkConditionSingleNum( const char *value, const char *fetchValue, const char *fetchOp );
 char *invertOperator( char *s );

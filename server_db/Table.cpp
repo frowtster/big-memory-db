@@ -30,6 +30,10 @@ Table::Table()
 	mIncCount = atoi(value);
 	FileIni::GetPrivateProfileStr( "TABLE", "INCLEMENT_PERCENT", "90", value, 100, "./server.ini" );
 	mIncPercent = atoi(value);
+
+	mFetchName[0] = '\0';
+	mFetchValue[0] = '\0';
+	mFetchOp[0] = '\0';
 }
 
 Table *Table::CreateTable( string name, int type )
@@ -383,14 +387,14 @@ int Table::FetchConditionSet( const char *cond )
 		return ret;
 
 	// name check;
-	if( _getColPos( fetchParam1 ) > 0 )
+	if( !strcasecmp( fetchParam1, "value" ) || _getColPos( fetchParam1 ) > 0 )
 	{
 		strcpy( mFetchName, fetchParam1 );
 		strcpy( mFetchValue, fetchParam2 );
 		strcpy( mFetchOp, fetchOp );
 		return ERROR_OK;
 	}
-	if( _getColPos( fetchParam2 ) > 0 )
+	if( !strcasecmp( fetchParam2, "value" ) || _getColPos( fetchParam2 ) > 0 )
 	{
 		strcpy( mFetchName, fetchParam2 );
 		strcpy( mFetchValue, fetchParam1 );
@@ -479,6 +483,7 @@ int Table::GetRow( const char *key, char *retval )
 	return ERROR_OK;
 }
 
+// todo
 int Table::GetRow( const char *key, long *retval )
 {
 	char *prow;
@@ -497,10 +502,22 @@ int Table::GetRow( const char *key, long *retval )
 		{
 			if( !strcmp( key, lastSelKey ) )
 			{
-				char *pcurr = _getNext( lastSelRow );
-				lastSelRow = pcurr;
+				char *pcurr;
+				do
+				{
+					pcurr = _getNext( lastSelRow );
+					lastSelRow = pcurr;
+					if( mFetchValue[0] == '\0' || mFetchOp[0] == '\0' )
+						break;
+					if( pcurr == NULL )
+						break;
+					if( checkConditionSingleNum( pcurr+pos, mFetchValue, mFetchOp ) == true )
+						break;
+				} while( pcurr != NULL );
+
 				if( pcurr != NULL )
 				{
+					// in single column
 					memcpy( retval, pcurr+pos, sizeof(uint64_t) );
 					return ERROR_OK;
 				}
@@ -518,13 +535,37 @@ int Table::GetRow( const char *key, long *retval )
 	}
 	prow = iter->second;
 
-	memcpy( retval, prow+pos, sizeof(uint64_t) );
-
 	if( mIsMultiValue == true )
 	{
 		strcpy( lastSelKey, key );
 		lastSelRow = prow;
+		char *pcurr = prow;
+
+		if( mFetchValue[0] == '\0' || mFetchOp[0] == '\0' )
+		{
+			memcpy( retval, pcurr+pos, sizeof(uint64_t) );
+			return ERROR_OK;
+		}
+
+		do
+		{
+			lastSelRow = pcurr;
+			if( checkConditionSingleNum( pcurr+pos, mFetchValue, mFetchOp ) == true )
+				break;
+			pcurr = _getNext( lastSelRow );
+			if( pcurr == NULL )
+				break;
+		} while( pcurr != NULL );
+		if( pcurr == NULL )
+		{
+			gLog.log("Not Found key.");
+			return ERROR_KEY_NOT_FOUND;
+		}
+		memcpy( retval, pcurr+pos, sizeof(uint64_t) );
+		return ERROR_OK;
 	}
+
+	memcpy( retval, prow+pos, sizeof(uint64_t) );
 	return ERROR_OK;
 }
 

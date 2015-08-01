@@ -134,6 +134,7 @@ int test_fetch_condition()
 	Table *tab1;
 	char value1[100];
 	long value2;
+	int ret;
 
 	// create table1
 	tab1 = Table::CreateTable("table1", TYPE_SINGLE_COLUMN | TYPE_MULTI_VALUE );
@@ -144,7 +145,7 @@ int test_fetch_condition()
 	tab1->AddRow( "key1", 4 );
 	tab1->AddRow( "key1", 5 );
 
-	tab1->SetFetchCondition( "value > 3" );
+	ret = tab1->FetchConditionSet( "value > 3" );
 
 	tab1->GetRow( "key1", &value2 );
 	assert( value2 == 4 );
