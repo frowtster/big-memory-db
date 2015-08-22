@@ -22,6 +22,8 @@ map<string, Table*> Table::mTableMap;
 
 int test_single_value()
 {
+	printf("test_single_value()\n");
+
 	Table *tab1, *tab2, *tab3;
 	char value1[100];
 	long value2;
@@ -81,6 +83,7 @@ int test_single_value()
 
 int test_multi_value()
 {
+	printf("test_multi_value()\n");
 	Table *tab1;
 	char value1[100];
 	long value2;
@@ -131,6 +134,8 @@ int test_multi_value()
 
 int test_fetch_condition()
 {
+	printf("test_fetch_condition()\n");
+
 	Table *tab1;
 	char value1[100];
 	long value2;

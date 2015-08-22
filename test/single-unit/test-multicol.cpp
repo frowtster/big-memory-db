@@ -21,6 +21,8 @@ map<string, Table*> Table::mTableMap;
 
 int test_std()
 {
+	printf("test_std()\n");
+
 	Table *tab1, *tab2;
 	ColumnInfo colinfo;
 	Row row;
