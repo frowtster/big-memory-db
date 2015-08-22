@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <inttypes.h>
 #include "Constants.h"
 #include "util.h"
 #include "ErrorCode.h"
@@ -100,7 +101,7 @@ int parseFetchCondition( const char *cond, char *fetchParam1, char *fetchParam2,
 	fetchParam2[0] = '\0';
 	fetchOperator[0] = '\0';
 	int count = sizeof(OPERATOR)/sizeof(OPERATOR[0]);
-	char *op_pos = NULL;
+	const char *op_pos = NULL;
 	for( int i=0; i< count; i++ )
 	{
 		op_pos = strstr( cond, OPERATOR[i] );
