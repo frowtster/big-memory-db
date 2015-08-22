@@ -1,0 +1,12 @@
+Test Platform
+
+Linux
+> CentOS 5.x (32/64 bit)
+> CentOS 6.x (32/64 bit)
+
+OSX
+> OSX 10.9 (64 bit)
+
+SunOS
+> SunOS 5.10 (64 bit)
+> SunOS 5.11 (64 bit)
