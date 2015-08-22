@@ -4,33 +4,36 @@ The goal of bmdb is to be a essencial NoSQL tool.
 
 4M memory database
 
-Multi Server
-Multi Table
-Multi Column
-Multi Value
+	Multi Server
+	Multi Table
+	Multi Column
+	Multi Value
+
 bmdb support the following functions.
 
-multi column (unlike memcached, redis)
-		multi value (put/get list of value)
-		data timeout
-		file backup/restore
-		64bit support
-		distributed server
-		written in C++
-		WHERE search condition
-		link value to another data
-		Support Platform
+	multi column (unlike memcached, redis)
+	multi value (put/get list of value)
+	data timeout
+	file backup/restore
+	64bit support
+	distributed server
+	written in C++
+	WHERE search condition
+	link value to another data
 
-		32/64 bit Linux
-		SunOS
-		OSX
-		FreeBSD
-		Release
+Support Platform
 
-		0.1.0 Release (2013/12/14)
-		0.2.0 Release (2013/12/29)
-		0.3.0 Release (2014/03/30)
-		0.4.0 Release (2014/09/10)
+	32/64 bit Linux
+	SunOS
+	OSX
+	FreeBSD
+
+Release
+
+	0.1.0 Release (2013/12/14)
+	0.2.0 Release (2013/12/29)
+	0.3.0 Release (2014/03/30)
+	0.4.0 Release (2014/09/10)
 
 For the latest information about BMD, please visit our website at:
 
