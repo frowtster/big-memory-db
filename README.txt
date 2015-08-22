@@ -35,7 +35,7 @@ Release
 	0.3.0 Release (2014/03/30)
 	0.4.0 Release (2014/09/10)
 
-For the latest information about BMD, please visit our website at:
+For the latest information about BMDB, please visit our website at:
 
 	https://code.google.com/p/big-memory-db/
 	https://github.com/frowtster/big-memory-db
