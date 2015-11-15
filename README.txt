@@ -38,3 +38,6 @@ For the latest information about BMDB, please visit our website at:
 and our email, at:
 	Y.K. Choi
 	frowtster@gmail.com, frowt@naver.com
+
+Move Repository to xp-dev.com (2015/11/14)
+	Repository : https://xp-dev.com/svn/big-memory-db/
