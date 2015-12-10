@@ -30,6 +30,7 @@ Release
 	0.2.0 Release (2013/12/29)
 	0.3.0 Release (2014/03/30)
 	0.4.0 Release (2014/09/10)
+	0.5.0 Release (2015/11/21)
 
 For the latest information about BMDB, please visit our website at:
 	https://code.google.com/p/big-memory-db/
